@@ -1,0 +1,152 @@
+﻿@model List<SistemaVeredas.Models.Vereda>
+@{
+    ViewData["Title"] = "Veredas";
+}
+
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <div>
+        <a asp-action="Index" class="small text-decoration-none">&larr; Inicio</a>
+        <h1 class="h3 mb-0">Veredas <span class="text-muted fs-6">(@Model.Count)</span></h1>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-controller="Veredas" asp-action="Index" class="btn btn-outline-secondary btn-sm">Ver como tabla</a>
+        <a asp-controller="Veredas" asp-action="Create" class="btn btn-primary btn-sm">+ Nueva vereda</a>
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">Todavía no hay veredas cargadas.</div>
+}
+else
+{
+    <div class="row g-2 mb-3">
+        <div class="col-12 col-md-8">
+            <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por calle, vecino, proveedor o paquete…" />
+        </div>
+        <div class="col-12 col-md-4">
+            <select id="filtroEstado" class="form-select">
+                <option value="">Todos los estados</option>
+                @foreach (var e in Enum.GetValues<Estado>())
+                {
+                    <option value="@e">@e.GetDisplayName()</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="row g-3" id="listaVeredas">
+        @foreach (var v in Model)
+        {
+            var proveedor = v.ACargoFrentista
+                ? "A cargo del frentista"
+                : v.Proveedor == null ? "Sin proveedor" : $"{v.Proveedor.Nombre} {v.Proveedor.Apellido}".Trim();
+            var vecino = $"{v.Nombre} {v.Apellido}".Trim();
+            var textoBusqueda = $"{v.Direccion} {v.EntreCalle1} {v.EntreCalle2} {vecino} {proveedor} {v.Paquete?.Nombre} {v.Observacion}".ToLower();
+
+            <div class="col-12 col-sm-6 col-lg-4 vereda-item" data-estado="@v.Estado" data-texto="@textoBusqueda">
+                <div class="card data-card h-100">
+                    @if (v.ListaFotos.Any())
+                    {
+                        <img src="~/@v.ListaFotos.First()" class="card-img-top data-card-img" alt="Foto de @v.Direccion" loading="lazy" />
+                    }
+                    else
+                    {
+                        <div class="data-card-img data-card-noimg">Sin foto</div>
+                    }
+                    <div class="card-body">
+                        <div class="d-flex flex-wrap gap-1 mb-2">
+                            <span class="badge @v.Estado.BadgeClass()">@v.Estado.GetDisplayName()</span>
+                            @if (v.Prioridad != null)
+                            {
+                                <span class="badge @v.Prioridad.BadgeClass()">Prioridad @v.Prioridad.GetDisplayName()</span>
+                            }
+                            @if (v.ListaFotos.Count > 1)
+                            {
+                                <span class="badge text-bg-light border">@v.ListaFotos.Count fotos</span>
+                            }
+                        </div>
+                        <h2 class="h5 card-title mb-0">@v.Direccion</h2>
+                        @if (!string.IsNullOrWhiteSpace(v.EntreCalle1) || !string.IsNullOrWhiteSpace(v.EntreCalle2))
+                        {
+                            <div class="text-muted small">entre @v.EntreCalle1 y @v.EntreCalle2</div>
+                        }
+
+                        <dl class="data-card-list mt-3 mb-0">
+                            @if (!string.IsNullOrEmpty(vecino))
+                            {
+                                <dt>Vecino</dt><dd>@vecino</dd>
+                            }
+                            <dt>Reparación</dt><dd>@proveedor</dd>
+                            <dt>Paquete</dt><dd>@(v.Paquete?.Nombre ?? "Sin paquete")</dd>
+                            <dt>Reclamo</dt><dd>@(v.FechaReclamo?.ToString("dd/MM/yyyy") ?? "—")</dd>
+                            <dt>Relevo</dt><dd>@(v.FechaRelevo?.ToString("dd/MM/yyyy") ?? "—")</dd>
+                            <dt>Superficie</dt>
+                            <dd>
+                                @if (v.Mediciones.Any())
+                                {
+                                    @($"{v.SuperficieTotal:N2} m²") <span class="text-muted">(@v.Mediciones.Count @(v.Mediciones.Count == 1 ? "medición" : "mediciones"))</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Sin medir</span>
+                                }
+                            </dd>
+                        </dl>
+
+                        @if (v.Mediciones.Any())
+                        {
+                            <div class="mt-2 d-flex flex-wrap gap-1">
+                                @foreach (var tipo in v.Mediciones.Where(m => m.TipoSuelo != null).Select(m => m.TipoSuelo!.Tipo).Distinct())
+                                {
+                                    <span class="badge rounded-pill text-bg-light border fw-normal">@tipo</span>
+                                }
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(v.Observacion))
+                        {
+                            <p class="small text-muted mt-2 mb-0 data-card-obs">@v.Observacion</p>
+                        }
+                    </div>
+                    <div class="card-footer bg-transparent d-flex gap-2">
+                        <a asp-controller="Veredas" asp-action="Details" asp-route-id="@v.Id" class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                        <a asp-controller="Veredas" asp-action="Edit" asp-route-id="@v.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
+                        @if (v.LinkGoogleMaps != null)
+                        {
+                            <a href="@v.LinkGoogleMaps" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success ms-auto">Mapa</a>
+                            <a href="@v.LinkStreetView" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success">360°</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div id="sinResultados" class="empty-state d-none">No hay veredas que coincidan con la búsqueda.</div>
+}
+
+@section Scripts {
+    <script>
+        (function () {
+            const texto = document.getElementById('filtroTexto');
+            const estado = document.getElementById('filtroEstado');
+            if (!texto) return;
+            const items = document.querySelectorAll('.vereda-item');
+            const vacio = document.getElementById('sinResultados');
+
+            function filtrar() {
+                const t = texto.value.trim().toLowerCase();
+                const e = estado.value;
+                let visibles = 0;
+                items.forEach(i => {
+                    const ok = (!t || i.dataset.texto.includes(t)) && (!e || i.dataset.estado === e);
+                    i.classList.toggle('d-none', !ok);
+                    if (ok) visibles++;
+                });
+                vacio.classList.toggle('d-none', visibles > 0);
+            }
+            texto.addEventListener('input', filtrar);
+            estado.addEventListener('change', filtrar);
+        })();
+    </script>
+}

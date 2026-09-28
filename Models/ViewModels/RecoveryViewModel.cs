@@ -1,0 +1,12 @@
+﻿using System.ComponentModel.DataAnnotations; // Importa atributos para validación de datos 
+
+
+namespace SistemaVeredas.Models.ViewModels // Define el espacio de nombres para modelos de vista
+{
+    public class RecoveryViewModel // Modelo para la vista de inicio de recuperación por email 
+    {
+        [EmailAddress] // Valida formato de email correcto 
+        [Required(ErrorMessage = "El campo Email es obligatorio")] // Campo obligatorio con mensaje personalizado
+        public string? UsEmail { get; set; } // Email del usuario para iniciar recuperación, puede ser nulo pero requerido
+    }
+}

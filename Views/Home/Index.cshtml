@@ -1,0 +1,48 @@
+﻿@model SistemaVeredas.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Página principal";
+}
+
+<div class="mb-4">
+    <h1 class="h3 mb-1">Bienvenido@(User.Identity?.Name is string n ? $", {n}" : "")</h1>
+    <p class="text-muted mb-0">Resumen de todo lo cargado en el sistema.</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-12 col-md-6">
+        <a asp-action="Veredas" class="home-tile home-tile-veredas">
+            <div class="home-tile-head">
+                <span class="home-tile-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18M5 16h14M7 12h10M9 8h6M11 4h2"/></svg>
+                </span>
+                <span class="home-tile-arrow">Ver todas &rarr;</span>
+            </div>
+            <h2 class="home-tile-title">Veredas</h2>
+            <div class="home-tile-number">@Model.TotalVeredas</div>
+            <div class="home-tile-sub">veredas cargadas &middot; @Model.SuperficieTotal.ToString("N2") m² medidos</div>
+            <div class="home-tile-stats">
+                <div><strong>@Model.VeredasPendientes</strong><span>Pendientes</span></div>
+                <div><strong>@Model.VeredasEnProceso</strong><span>En proceso</span></div>
+                <div><strong>@Model.VeredasFinalizadas</strong><span>Finalizadas</span></div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <a asp-action="Paquetes" class="home-tile home-tile-paquetes">
+            <div class="home-tile-head">
+                <span class="home-tile-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10"/></svg>
+                </span>
+                <span class="home-tile-arrow">Ver todos &rarr;</span>
+            </div>
+            <h2 class="home-tile-title">Paquetes</h2>
+            <div class="home-tile-number">@Model.TotalPaquetes</div>
+            <div class="home-tile-sub">paquetes armados</div>
+            <div class="home-tile-stats">
+                <div><strong>@Model.VeredasEnPaquetes</strong><span>Veredas en paquetes</span></div>
+                <div><strong>@Model.VeredasSinPaquete</strong><span>Sin paquete</span></div>
+            </div>
+        </a>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+﻿@model IEnumerable<SistemaVeredas.Models.ViewModels.UsuarioViewModel>
+
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<h1>Usuarios</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Nuevo usuario</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.UsApellido)</th>
+            <th>@Html.DisplayNameFor(model => model.UsNombre)</th>
+            <th>@Html.DisplayNameFor(model => model.UsEmail)</th>
+            <th>@Html.DisplayNameFor(model => model.UsActivo)</th>
+            <th>@Html.DisplayNameFor(model => model.UltimoAcceso)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.UsApellido)</td>
+            <td>@Html.DisplayFor(modelItem => item.UsNombre)</td>
+            <td>@Html.DisplayFor(modelItem => item.UsEmail)</td>
+            <td>@(item.UsActivo ? "Sí" : "No")</td>
+            <td>@Html.DisplayFor(modelItem => item.UltimoAcceso)</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.UsId">Editar</a> |
+                <a asp-action="Details" asp-route-id="@item.UsId">Detalles</a> |
+                <a asp-action="Delete" asp-route-id="@item.UsId">Eliminar</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

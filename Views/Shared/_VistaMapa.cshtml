@@ -1,0 +1,62 @@
+﻿@* Muestra la ubicación de una vereda (solo lectura).
+   Con GoogleMaps:EmbedApiKey configurada usa Google Maps Embed (gratis e ilimitado): mapa y Street View 360°.
+   Sin clave, usa un minimapa de OpenStreetMap.
+   ViewData: "Modo" = "mini" (tabla) | "completo" (detalle). *@
+@model SistemaVeredas.Models.Vereda
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
+@{
+    var clave = Config["GoogleMaps:EmbedApiKey"];
+    var modo = ViewData["Modo"] as string ?? "completo";
+    var punto = Model.PuntoUrl;
+    var claveUrl = string.IsNullOrWhiteSpace(clave) ? null : Uri.EscapeDataString(clave);
+}
+
+@if (punto == null)
+{
+    <span class="text-muted small">Sin ubicación</span>
+}
+else if (modo == "mini")
+{
+    @if (claveUrl != null)
+    {
+        <iframe class="mapa-mini" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                src="https://www.google.com/maps/embed/v1/place?key=@claveUrl&q=@punto&zoom=16&language=es"
+                title="Mapa de @Model.Direccion"></iframe>
+    }
+    <div class="small">
+        <a href="@Model.LinkGoogleMaps" target="_blank" rel="noopener">Mapa</a> &middot;
+        <a href="@Model.LinkStreetView" target="_blank" rel="noopener">360°</a>
+    </div>
+}
+else
+{
+    <div class="row g-2">
+        <div class="col-12 col-lg-6">
+            @if (claveUrl != null)
+            {
+                <iframe class="mapa-vereda" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                        src="https://www.google.com/maps/embed/v1/place?key=@claveUrl&q=@punto&zoom=18&language=es"
+                        title="Mapa de @Model.Direccion"></iframe>
+            }
+            else
+            {
+                <div class="mapa-vereda mapa-solo-lectura" data-ubicacion="@Model.Ubicacion"></div>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+                <script src="~/js/mapa-vereda.js" asp-append-version="true"></script>
+            }
+        </div>
+        @if (claveUrl != null)
+        {
+            <div class="col-12 col-lg-6">
+                <iframe class="mapa-vereda" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen
+                        src="https://www.google.com/maps/embed/v1/streetview?key=@claveUrl&location=@punto&fov=80&language=es"
+                        title="Street View de @Model.Direccion"></iframe>
+            </div>
+        }
+    </div>
+    <div class="mt-1">
+        <a href="@Model.LinkGoogleMaps" target="_blank" rel="noopener">Abrir en Google Maps</a> &middot;
+        <a href="@Model.LinkStreetView" target="_blank" rel="noopener">Ver en Street View (360°)</a>
+    </div>
+}

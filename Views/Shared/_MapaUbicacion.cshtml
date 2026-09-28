@@ -1,0 +1,24 @@
+﻿@* Minimapa (OpenStreetMap, gratis y sin clave) para elegir la ubicación de la vereda en Colón, Bs. As.
+   Guarda "latitud,longitud" en el campo oculto Ubicacion. *@
+@model SistemaVeredas.Models.Vereda
+
+<div class="form-group mb-3">
+    <label class="control-label">Ubicación en el mapa</label>
+    <input type="hidden" asp-for="Ubicacion" id="Ubicacion" />
+
+    <div class="d-flex flex-wrap gap-2 mb-2">
+        <button type="button" id="btnBuscarMapa" class="btn btn-sm btn-outline-primary">Buscar la dirección en el mapa</button>
+        <button type="button" id="btnQuitarUbicacion" class="btn btn-sm btn-outline-secondary">Quitar ubicación</button>
+    </div>
+    <div id="mapaVereda" class="mapa-vereda"></div>
+    <div class="small mt-1"><a id="linkStreetView" href="#" target="_blank" rel="noopener" class="d-none">Ver este punto en Street View (360°) &rarr;</a></div>
+    <div id="mapaEstado" class="form-text">
+        Completá la calle y la altura (o las calles entre las que está) y tocá "Buscar".
+        Después podés arrastrar el pin o hacer clic en el mapa para ajustar.
+    </div>
+    <span asp-validation-for="Ubicacion" class="text-danger"></span>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="~/js/mapa-vereda.js" asp-append-version="true"></script>

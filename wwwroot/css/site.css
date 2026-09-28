@@ -1,0 +1,209 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+  color: var(--bs-secondary-color);
+  text-align: end;
+}
+
+.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+  text-align: start;
+}
+
+/* ---------- Página principal y tarjetas ---------- */
+body {
+  background-color: #f5f6f8;
+}
+
+.home-tile {
+  display: block;
+  height: 100%;
+  min-height: 260px;
+  padding: 1.75rem;
+  border-radius: 1rem;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .08);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.home-tile:hover {
+  color: #fff;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .14);
+}
+
+.home-tile-veredas { background: linear-gradient(135deg, #1f6f5c, #2f9e7f); }
+.home-tile-paquetes { background: linear-gradient(135deg, #2c4a8a, #4a72c4); }
+
+.home-tile-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.home-tile-icon {
+  display: inline-flex;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .18);
+  align-items: center;
+  justify-content: center;
+}
+
+.home-tile-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.home-tile-arrow { font-size: .9rem; opacity: .85; }
+.home-tile-title { font-size: 1.1rem; font-weight: 600; margin: 1.25rem 0 0; opacity: .9; }
+.home-tile-number { font-size: 3.5rem; font-weight: 700; line-height: 1.1; }
+.home-tile-sub { opacity: .85; }
+
+.home-tile-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: 1.25rem;
+}
+
+.home-tile-stats div {
+  flex: 1 1 90px;
+  background: rgba(255, 255, 255, .15);
+  border-radius: .6rem;
+  padding: .5rem .75rem;
+}
+
+.home-tile-stats strong { display: block; font-size: 1.35rem; }
+.home-tile-stats span { font-size: .8rem; opacity: .9; }
+
+.data-card {
+  border: 0;
+  border-radius: .9rem;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .06);
+}
+
+.data-card-img {
+  height: 170px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.data-card-noimg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9ecef;
+  color: #8a939c;
+  font-size: .9rem;
+}
+
+.data-card-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .2rem .75rem;
+  font-size: .9rem;
+}
+
+.data-card-list dt { font-weight: 500; color: #6c757d; }
+.data-card-list dd { margin: 0; }
+
+.data-card-obs {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.mini-stat {
+  background: #f5f6f8;
+  border-radius: .6rem;
+  padding: .5rem;
+}
+
+.mini-stat strong { display: block; font-size: 1.2rem; }
+.mini-stat span { font-size: .8rem; color: #6c757d; }
+
+.paquete-veredas { max-height: 240px; overflow-y: auto; }
+
+.empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #6c757d;
+  background: #fff;
+  border-radius: .9rem;
+}
+
+
+/* ---------- Minimapa de ubicación ---------- */
+.mapa-vereda {
+  width: 100%;
+  height: 280px;
+  border: 0;
+  border-radius: .6rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, .1);
+}
+
+.mapa-vereda-detalle {
+  max-width: 520px;
+  height: 260px;
+  display: block;
+  margin-bottom: .35rem;
+}
+
+
+/* ---------- Tabla de veredas ---------- */
+.tabla-veredas td, .tabla-veredas th { vertical-align: middle; }
+
+.foto-mini {
+  width: 72px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: .4rem;
+  display: block;
+}
+
+.foto-mini-vacia {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e9ecef;
+  color: #8a939c;
+  font-size: .7rem;
+}
+
+.mapa-mini {
+  width: 150px;
+  height: 90px;
+  border: 0;
+  border-radius: .4rem;
+  display: block;
+}

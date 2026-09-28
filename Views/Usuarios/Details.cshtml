@@ -1,0 +1,30 @@
+﻿@model SistemaVeredas.Models.ViewModels.UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Detalles";
+}
+
+<h1>Detalles</h1>
+
+<div>
+    <h4>Usuario</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsNombre)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.UsNombre)</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsApellido)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.UsApellido)</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsEmail)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.UsEmail)</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsActivo)</dt>
+        <dd class="col-sm-9">@(Model.UsActivo ? "Sí" : "No")</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaCreacion)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.FechaCreacion)</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UltimoAcceso)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.UltimoAcceso)</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.UsId">Editar</a> |
+    <a asp-action="Index">Volver a la lista</a>
+</div>

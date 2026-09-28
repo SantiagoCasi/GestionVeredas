@@ -1,0 +1,33 @@
+﻿@model SistemaVeredas.Models.ViewModels.UsuarioViewModel
+
+@{
+    ViewData["Title"] = "Eliminar";
+}
+
+<h1>Eliminar</h1>
+
+<h3>¿Seguro que querés eliminar este usuario?</h3>
+<div>
+    <h4>Usuario</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsNombre)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.UsNombre)</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsApellido)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.UsApellido)</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsEmail)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.UsEmail)</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsActivo)</dt>
+        <dd class="col-sm-9">@(Model.UsActivo ? "Sí" : "No")</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaCreacion)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.FechaCreacion)</dd>
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UltimoAcceso)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.UltimoAcceso)</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="UsId" />
+        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
+        <a asp-action="Index">Volver a la lista</a>
+    </form>
+</div>

@@ -1,0 +1,58 @@
+﻿@model SistemaVeredas.Models.ViewModels.UsuarioCreateViewModel
+
+@{
+    ViewData["Title"] = "Nuevo usuario";
+}
+
+<h1>Nuevo usuario</h1>
+
+<h4>Usuario</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-2">
+                <label asp-for="UsNombre" class="control-label"></label>
+                <input asp-for="UsNombre" class="form-control" />
+                <span asp-validation-for="UsNombre" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="UsApellido" class="control-label"></label>
+                <input asp-for="UsApellido" class="form-control" />
+                <span asp-validation-for="UsApellido" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="UsEmail" class="control-label"></label>
+                <input asp-for="UsEmail" type="email" class="form-control" />
+                <span asp-validation-for="UsEmail" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="UsContrasena" class="control-label"></label>
+                <input asp-for="UsContrasena" class="form-control" />
+                <span asp-validation-for="UsContrasena" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-2">
+                <label asp-for="ConfirmarContrasena" class="control-label"></label>
+                <input asp-for="ConfirmarContrasena" class="form-control" />
+                <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check mb-2">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="UsActivo" /> @Html.DisplayNameFor(model => model.UsActivo)
+                </label>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Crear" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Volver a la lista</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

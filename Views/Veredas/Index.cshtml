@@ -1,0 +1,125 @@
+﻿@model IEnumerable<SistemaVeredas.Models.Vereda>
+
+@{
+    ViewData["Title"] = "Veredas";
+}
+
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h1 class="h3 mb-0">Veredas <span class="text-muted fs-6">(@Model.Count())</span></h1>
+    <div class="d-flex gap-2">
+        <a asp-controller="Home" asp-action="Veredas" class="btn btn-outline-secondary btn-sm">Ver como tarjetas</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">+ Nueva vereda</a>
+    </div>
+</div>
+
+<div class="row g-2 mb-3">
+    <div class="col-12 col-md-8">
+        <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por calle, vecino, proveedor o paquete…" />
+    </div>
+    <div class="col-12 col-md-4">
+        <select id="filtroEstado" class="form-select">
+            <option value="">Todos los estados</option>
+            @foreach (var e in Enum.GetValues<Estado>())
+            {
+                <option value="@e">@e.GetDisplayName()</option>
+            }
+        </select>
+    </div>
+</div>
+
+<div class="table-responsive bg-white rounded-3 shadow-sm">
+    <table class="table table-hover align-middle mb-0 tabla-veredas">
+        <thead class="table-light">
+            <tr>
+                <th>Foto</th>
+                <th>Dirección</th>
+                <th>Vecino</th>
+                <th>Estado</th>
+                <th>Reparación</th>
+                <th>Paquete</th>
+                <th>Reclamo</th>
+                <th>Ubicación</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            var vecino = $"{item.Nombre} {item.Apellido}".Trim();
+            var reparacion = item.ACargoFrentista
+                ? "Frentista"
+                : item.Proveedor == null ? "—" : $"{item.Proveedor.Nombre} {item.Proveedor.Apellido}".Trim();
+            var texto = $"{item.Direccion} {item.EntreCalle1} {item.EntreCalle2} {vecino} {reparacion} {item.Paquete?.Nombre}".ToLower();
+
+            <tr class="fila-vereda" data-estado="@item.Estado" data-texto="@texto">
+                <td>
+                    @if (item.ListaFotos.Any())
+                    {
+                        <a asp-action="Details" asp-route-id="@item.Id">
+                            <img src="~/@item.ListaFotos.First()" class="foto-mini" alt="Foto de @item.Direccion" loading="lazy" />
+                        </a>
+                        @if (item.ListaFotos.Count > 1)
+                        {
+                            <div class="small text-muted text-center">+@(item.ListaFotos.Count - 1)</div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="foto-mini foto-mini-vacia">Sin foto</div>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="fw-semibold text-decoration-none">@item.Direccion</a>
+                    @if (!string.IsNullOrWhiteSpace(item.EntreCalle1) || !string.IsNullOrWhiteSpace(item.EntreCalle2))
+                    {
+                        <div class="small text-muted">entre @item.EntreCalle1 y @item.EntreCalle2</div>
+                    }
+                </td>
+                <td>@(string.IsNullOrEmpty(vecino) ? "—" : vecino)</td>
+                <td>
+                    <span class="badge @item.Estado.BadgeClass()">@item.Estado.GetDisplayName()</span>
+                    @if (item.Prioridad != null)
+                    {
+                        <div><span class="badge @item.Prioridad.BadgeClass() mt-1">@item.Prioridad.GetDisplayName()</span></div>
+                    }
+                </td>
+                <td>@reparacion</td>
+                <td>@(item.Paquete?.Nombre ?? "—")</td>
+                <td class="text-nowrap">@(item.FechaReclamo?.ToString("dd/MM/yyyy") ?? "—")</td>
+                <td>
+                    <partial name="_VistaMapa" model="item" view-data='new ViewDataDictionary(ViewData) { ["Modo"] = "mini" }' />
+                </td>
+                <td class="text-nowrap">
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Ver</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Borrar</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+<div id="sinResultados" class="empty-state d-none mt-3">No hay veredas que coincidan con la búsqueda.</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const texto = document.getElementById('filtroTexto');
+            const estado = document.getElementById('filtroEstado');
+            const filas = document.querySelectorAll('.fila-vereda');
+            const vacio = document.getElementById('sinResultados');
+            function filtrar() {
+                const t = texto.value.trim().toLowerCase(), e = estado.value;
+                let visibles = 0;
+                filas.forEach(f => {
+                    const ok = (!t || f.dataset.texto.includes(t)) && (!e || f.dataset.estado === e);
+                    f.classList.toggle('d-none', !ok);
+                    if (ok) visibles++;
+                });
+                vacio.classList.toggle('d-none', visibles > 0);
+            }
+            texto.addEventListener('input', filtrar);
+            estado.addEventListener('change', filtrar);
+        })();
+    </script>
+}
