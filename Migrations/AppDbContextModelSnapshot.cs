@@ -22,39 +22,6 @@ namespace SistemaVeredas.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SistemaVeredas.Models.Medicion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("Ancho")
-                        .HasColumnType("decimal(6,2)");
-
-                    b.Property<decimal>("Largo")
-                        .HasColumnType("decimal(6,2)");
-
-                    b.Property<string>("Sector")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("TipoSueloId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("VeredaId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TipoSueloId");
-
-                    b.HasIndex("VeredaId");
-
-                    b.ToTable("Mediciones");
-                });
-
             modelBuilder.Entity("SistemaVeredas.Models.Paquete", b =>
                 {
                     b.Property<int>("Id")
@@ -109,6 +76,40 @@ namespace SistemaVeredas.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Proveedores");
+                });
+
+            modelBuilder.Entity("SistemaVeredas.Models.Rotura", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Medidas")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("SubtotalM2")
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<int>("TipoSueloId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("VeredaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TipoSueloId");
+
+                    b.HasIndex("VeredaId");
+
+                    b.ToTable("Roturas");
                 });
 
             modelBuilder.Entity("SistemaVeredas.Models.TipoSuelo", b =>
@@ -235,6 +236,14 @@ namespace SistemaVeredas.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<string>("Medicion")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("MedicionCordon")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("Nombre")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -253,6 +262,15 @@ namespace SistemaVeredas.Migrations
                     b.Property<int?>("ProveedorId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("TieneCordon")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("TotalCordonM3")
+                        .HasColumnType("decimal(10,3)");
+
+                    b.Property<decimal?>("TotalM2")
+                        .HasColumnType("decimal(10,2)");
+
                     b.Property<string>("Ubicacion")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -266,25 +284,6 @@ namespace SistemaVeredas.Migrations
                     b.ToTable("Veredas");
                 });
 
-            modelBuilder.Entity("SistemaVeredas.Models.Medicion", b =>
-                {
-                    b.HasOne("SistemaVeredas.Models.TipoSuelo", "TipoSuelo")
-                        .WithMany("Mediciones")
-                        .HasForeignKey("TipoSueloId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("SistemaVeredas.Models.Vereda", "Vereda")
-                        .WithMany("Mediciones")
-                        .HasForeignKey("VeredaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TipoSuelo");
-
-                    b.Navigation("Vereda");
-                });
-
             modelBuilder.Entity("SistemaVeredas.Models.Paquete", b =>
                 {
                     b.HasOne("SistemaVeredas.Models.Proveedor", "Proveedor")
@@ -294,6 +293,25 @@ namespace SistemaVeredas.Migrations
                         .IsRequired();
 
                     b.Navigation("Proveedor");
+                });
+
+            modelBuilder.Entity("SistemaVeredas.Models.Rotura", b =>
+                {
+                    b.HasOne("SistemaVeredas.Models.TipoSuelo", "TipoSuelo")
+                        .WithMany("Roturas")
+                        .HasForeignKey("TipoSueloId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SistemaVeredas.Models.Vereda", "Vereda")
+                        .WithMany("Roturas")
+                        .HasForeignKey("VeredaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TipoSuelo");
+
+                    b.Navigation("Vereda");
                 });
 
             modelBuilder.Entity("SistemaVeredas.Models.Vereda", b =>
@@ -327,12 +345,12 @@ namespace SistemaVeredas.Migrations
 
             modelBuilder.Entity("SistemaVeredas.Models.TipoSuelo", b =>
                 {
-                    b.Navigation("Mediciones");
+                    b.Navigation("Roturas");
                 });
 
             modelBuilder.Entity("SistemaVeredas.Models.Vereda", b =>
                 {
-                    b.Navigation("Mediciones");
+                    b.Navigation("Roturas");
                 });
 #pragma warning restore 612, 618
         }

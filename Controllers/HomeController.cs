@@ -21,7 +21,6 @@ namespace SistemaVeredas.Controllers
         public async Task<IActionResult> Index()
         {
             var estados = await _context.Veredas.Select(v => new { v.Estado, v.PaqueteId }).ToListAsync();
-            var mediciones = await _context.Mediciones.Select(m => new { m.Largo, m.Ancho }).ToListAsync();
 
             var model = new HomeViewModel
             {
@@ -35,7 +34,8 @@ namespace SistemaVeredas.Controllers
                 TotalPaquetes = await _context.Paquetes.CountAsync(),
                 VeredasEnPaquetes = estados.Count(v => v.PaqueteId != null),
                 VeredasSinPaquete = estados.Count(v => v.PaqueteId == null),
-                SuperficieTotal = mediciones.Where(m => m.Ancho.HasValue).Sum(m => m.Largo * m.Ancho!.Value)
+                SuperficieTotal = await _context.Veredas.SumAsync(v => v.TotalM2 ?? 0),
+                CordonTotalM3 = await _context.Veredas.SumAsync(v => v.TotalCordonM3 ?? 0)
             };
 
             return View(model);
@@ -47,7 +47,7 @@ namespace SistemaVeredas.Controllers
             var veredas = await _context.Veredas
                 .Include(v => v.Proveedor)
                 .Include(v => v.Paquete)
-                .Include(v => v.Mediciones).ThenInclude(m => m.TipoSuelo)
+                .Include(v => v.Roturas).ThenInclude(r => r.TipoSuelo)
                 .OrderByDescending(v => v.FechaReclamo ?? v.FechaRelevo)
                 .ThenByDescending(v => v.Id)
                 .AsNoTracking()
@@ -61,7 +61,7 @@ namespace SistemaVeredas.Controllers
         {
             var paquetes = await _context.Paquetes
                 .Include(p => p.Proveedor)
-                .Include(p => p.Veredas).ThenInclude(v => v.Mediciones)
+                .Include(p => p.Veredas)
                 .OrderByDescending(p => p.Fecha)
                 .AsNoTracking()
                 .ToListAsync();

@@ -6,6 +6,14 @@
 
 <h1>Index</h1>
 
+@if (TempData["Mensaje"] is string mensaje)
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        @mensaje
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
 <p>
     <a asp-action="Create">Create New</a>
 </p>

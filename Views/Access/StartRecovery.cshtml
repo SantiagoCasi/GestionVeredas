@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,
 initial-scale=1.0" />
-    <title>@ViewBag.Title - ISFDyT N°124</title>
+    <title>@ViewBag.Title - SistemaVeredas</title>
     <link rel="stylesheet"
           href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet"
@@ -203,10 +203,6 @@ initial-scale=1.0" />
 </head>
 <body>
     <div class="container">
-        @* <div class="logo-container">
-            <img src="~/css/image/logo.png" 
-            alt="Logo ISFDyT N°124">
-        </div> *@
         <div class="card">
             <div class="card-header text-center">
                 <h3 class="m-0">Recuperar Contraseña</h3>
@@ -269,7 +265,18 @@ initial-scale=1.0" />
                             Swal.fire({
                                 icon: 'success',
                                 title: '¡Correo enviado!',
-                                text: '@Html.Raw(TempData["MensajeExito"])',
+                                text: @Json.Serialize(TempData["MensajeExito"]),
+                                confirmButtonText: 'Aceptar'
+                            });
+                        </text>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <text>
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: @Json.Serialize(TempData["Error"]),
                                 confirmButtonText: 'Aceptar'
                             });
                         </text>
@@ -280,7 +287,7 @@ initial-scale=1.0" />
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
-                                text: '@Html.Raw(ViewBag.Error)',
+                                text: @Json.Serialize((string?)ViewBag.Error),
                                 confirmButtonText: 'Aceptar'
                             });
                         </text>

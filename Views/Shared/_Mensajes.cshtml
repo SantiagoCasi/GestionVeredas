@@ -1,0 +1,34 @@
+@* Mensajes de resultado guardados en TempData (SPEC-002): Exito, Aviso y Error.
+   Se muestran codificados (sin Html.Raw). Si el éxito lleva enlace, van ExitoEnlace y ExitoEnlaceTexto. *@
+@{
+    var exito = TempData["Exito"] as string;
+    var exitoEnlace = TempData["ExitoEnlace"] as string;
+    var exitoEnlaceTexto = TempData["ExitoEnlaceTexto"] as string;
+    var aviso = TempData["Aviso"] as string;
+    var error = TempData["Error"] as string;
+}
+@if (!string.IsNullOrEmpty(exito))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @exito
+        @if (!string.IsNullOrEmpty(exitoEnlace))
+        {
+            <a href="@exitoEnlace" class="alert-link ms-1">@(string.IsNullOrEmpty(exitoEnlaceTexto) ? "Ver" : exitoEnlaceTexto)</a>
+        }
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+@if (!string.IsNullOrEmpty(aviso))
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @aviso
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @error
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}

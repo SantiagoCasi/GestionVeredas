@@ -35,3 +35,10 @@ appsettings.*.local.json
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Configuración de producción (tiene contraseñas)
+appsettings.Production.json
+publicar.log
+
+# Resultados de las pruebas
+TestResults/

@@ -1,0 +1,28 @@
+@* Alta rápida de un tipo de suelo desde el formulario de la vereda (RF-VER-06).
+   Va FUERA del <form> principal: no se pueden anidar formularios. Lo maneja wwwroot/js/medicion-vereda.js. *@
+<div class="modal fade" id="modalTipoSuelo" tabindex="-1" aria-labelledby="modalTipoSueloTitulo" aria-hidden="true"
+     data-url="@Url.Action("CrearRapido", "TipoSuelos")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="modalTipoSueloTitulo">Nuevo tipo de suelo</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-danger small mb-2 ts-rapido-errores"></div>
+                <div class="mb-2">
+                    <label for="tsRapidoTipo" class="form-label">Nombre</label>
+                    <input id="tsRapidoTipo" class="form-control" maxlength="100" required autocomplete="off" />
+                </div>
+                <div class="mb-2">
+                    <label for="tsRapidoMedida" class="form-label">Medida de la baldosa</label>
+                    <input id="tsRapidoMedida" class="form-control" maxlength="20" placeholder="40x40" autocomplete="off" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary ts-rapido-agregar">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>

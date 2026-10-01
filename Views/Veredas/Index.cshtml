@@ -12,11 +12,23 @@
     </div>
 </div>
 
+@{
+    var cantMedidas = Model.Count(v => v.EstaMedida);
+    var cantSinMedir = Model.Count() - cantMedidas;
+    var paquetes = ViewData["Paquetes"] as List<SelectListItem> ?? new List<SelectListItem>();
+}
 <div class="row g-2 mb-3">
-    <div class="col-12 col-md-8">
+    <div class="col-12 col-md-6">
         <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por calle, vecino, proveedor o paquete…" />
     </div>
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-3">
+        <select id="filtroMedicion" class="form-select" aria-label="Filtrar por medición">
+            <option value="">Medidas y sin medir</option>
+            <option value="si">Medidas (@cantMedidas)</option>
+            <option value="no">Sin medir (@cantSinMedir)</option>
+        </select>
+    </div>
+    <div class="col-12 col-md-3">
         <select id="filtroEstado" class="form-select">
             <option value="">Todos los estados</option>
             @foreach (var e in Enum.GetValues<Estado>())
@@ -27,14 +39,41 @@
     </div>
 </div>
 
+@* Barra de acción: aparece cuando hay al menos una vereda marcada (RF-PAQ-08). *@
+<div id="barraSeleccion" class="d-none bg-white border rounded-3 shadow-sm p-2 mb-3">
+    <form id="formAgregarAPaquete" method="post" asp-action="AgregarAPaquete" class="d-flex flex-wrap align-items-center gap-2">
+        <span class="fw-semibold contador-seleccion">0 seleccionadas</span>
+        @if (paquetes.Any())
+        {
+            <select name="paqueteId" id="paqueteDestino" class="form-select form-select-sm w-auto" aria-label="Paquete">
+                <option value="">Elegí un paquete…</option>
+                @foreach (var p in paquetes)
+                {
+                    <option value="@p.Value">@p.Text</option>
+                }
+            </select>
+            <button type="submit" class="btn btn-primary btn-sm btn-agregar-seleccion">Agregar al paquete…</button>
+            <span id="errorPaquete" class="text-danger small"></span>
+        }
+        else
+        {
+            <span>Todavía no hay paquetes. <a asp-controller="Paquetes" asp-action="Create">Creá uno</a></span>
+        }
+    </form>
+</div>
+
 <div class="table-responsive bg-white rounded-3 shadow-sm">
     <table class="table table-hover align-middle mb-0 tabla-veredas">
         <thead class="table-light">
             <tr>
+                <th style="width:2.5rem">
+                    <input type="checkbox" id="seleccionarTodas" class="form-check-input" aria-label="Seleccionar todas" />
+                </th>
                 <th>Foto</th>
                 <th>Dirección</th>
                 <th>Vecino</th>
                 <th>Estado</th>
+                <th>Medición</th>
                 <th>Reparación</th>
                 <th>Paquete</th>
                 <th>Reclamo</th>
@@ -51,7 +90,24 @@
                 : item.Proveedor == null ? "—" : $"{item.Proveedor.Nombre} {item.Proveedor.Apellido}".Trim();
             var texto = $"{item.Direccion} {item.EntreCalle1} {item.EntreCalle2} {vecino} {reparacion} {item.Paquete?.Nombre}".ToLower();
 
-            <tr class="fila-vereda" data-estado="@item.Estado" data-texto="@texto">
+            var medida = item.EstaMedida;
+            var totalesMedicion = string.Join(" · ", new[] { MedicionService.FormatearM2(item.TotalM2), MedicionService.FormatearM3(item.TotalCordonM3) }
+                .Where(x => x != null));
+
+            <tr class="fila-vereda" data-estado="@item.Estado" data-medida="@(medida ? "si" : "no")" data-texto="@texto">
+                <td>
+                    @if (item.PaqueteId == null)
+                    {
+                        <input type="checkbox" class="form-check-input sel-vereda" name="veredaIds" value="@item.Id"
+                               form="formAgregarAPaquete" aria-label="@($"Elegir {item.Direccion}")" />
+                    }
+                    else
+                    {
+                        <input type="checkbox" class="form-check-input sel-vereda" disabled
+                               title="@($"Ya está en «{item.Paquete?.Nombre}». Quitala de ese paquete para moverla.")"
+                               aria-label="@($"{item.Direccion} ya está en un paquete")" />
+                    }
+                </td>
                 <td>
                     @if (item.ListaFotos.Any())
                     {
@@ -83,6 +139,17 @@
                         <div><span class="badge @item.Prioridad.BadgeClass() mt-1">@item.Prioridad.GetDisplayName()</span></div>
                     }
                 </td>
+                <td class="text-nowrap">
+                    @if (medida)
+                    {
+                        <span class="badge text-bg-success">Medida</span>
+                        <div class="small text-muted mt-1">@totalesMedicion</div>
+                    }
+                    else
+                    {
+                        <span class="badge text-bg-light border text-secondary">Sin medir</span>
+                    }
+                </td>
                 <td>@reparacion</td>
                 <td>@(item.Paquete?.Nombre ?? "—")</td>
                 <td class="text-nowrap">@(item.FechaReclamo?.ToString("dd/MM/yyyy") ?? "—")</td>
@@ -102,24 +169,5 @@
 <div id="sinResultados" class="empty-state d-none mt-3">No hay veredas que coincidan con la búsqueda.</div>
 
 @section Scripts {
-    <script>
-        (function () {
-            const texto = document.getElementById('filtroTexto');
-            const estado = document.getElementById('filtroEstado');
-            const filas = document.querySelectorAll('.fila-vereda');
-            const vacio = document.getElementById('sinResultados');
-            function filtrar() {
-                const t = texto.value.trim().toLowerCase(), e = estado.value;
-                let visibles = 0;
-                filas.forEach(f => {
-                    const ok = (!t || f.dataset.texto.includes(t)) && (!e || f.dataset.estado === e);
-                    f.classList.toggle('d-none', !ok);
-                    if (ok) visibles++;
-                });
-                vacio.classList.toggle('d-none', visibles > 0);
-            }
-            texto.addEventListener('input', filtrar);
-            estado.addEventListener('change', filtrar);
-        })();
-    </script>
+    <script src="~/js/seleccion-veredas.js" asp-append-version="true"></script>
 }

@@ -111,6 +111,7 @@
                 </select>
                 <span asp-validation-for="PaqueteId" class="text-danger"></span>
             </div>
+            <partial name="_Medicion" model="Model" />
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
@@ -122,6 +123,9 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
+<partial name="_TipoSueloRapido" />
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/medicion-vereda.js" asp-append-version="true"></script>
 }

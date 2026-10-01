@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +30,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DBSV")));
 
 builder.Services.AddScoped<FotoService>();
+builder.Services.AddScoped<PaqueteService>();
+
+// Correo para la recuperación de contraseña: la cuenta y la contraseña van en User Secrets
+// (desarrollo) o en appsettings.Production.json (hosting), nunca en el código.
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection(SmtpOptions.Seccion));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
@@ -38,6 +44,15 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    // Contra qué base arranca la app: solo servidor y nombre, nunca la cadena completa (puede tener contraseña).
+    var csb = new Microsoft.Data.SqlClient.SqlConnectionStringBuilder(db.Database.GetConnectionString() ?? string.Empty);
+    app.Logger.LogInformation("Base de datos: {Base} en {Servidor}", csb.InitialCatalog, csb.DataSource);
+
+    // Crea las tablas o aplica las migraciones nuevas al arrancar (necesario en el hosting,
+    // donde no se corre "dotnet ef database update"). Si la base ya está al día, no hace nada.
+    db.Database.Migrate();
+
     var email = app.Configuration["UsuarioInicial:Email"];
     var contrasena = app.Configuration["UsuarioInicial:Contrasena"];
 
@@ -65,6 +80,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+// Sirve los archivos que se agregan en tiempo de ejecución (fotos subidas en wwwroot/uploads).
+// MapStaticAssets solo sirve los archivos que existían al compilar/publicar.
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
@@ -79,3 +97,6 @@ app.MapControllerRoute(
 
 
 app.Run();
+
+// Necesario para las pruebas de integración (WebApplicationFactory<Program>).
+public partial class Program { }

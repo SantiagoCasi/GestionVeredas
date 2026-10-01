@@ -1,128 +1,235 @@
 ﻿@model SistemaVeredas.Models.Vereda
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = $"Vereda {Model.Direccion}";
+
+    var fotos = Model.ListaFotos;
+    var vecino = $"{Model.Nombre} {Model.Apellido}".Trim();
+    var calles = new[] { Model.EntreCalle1, Model.EntreCalle2 }.Where(c => !string.IsNullOrWhiteSpace(c)).ToList();
+    var entreCalles = calles.Count == 0 ? null : string.Join(" y ", calles);
+    var proveedor = Model.Proveedor == null ? null : $"{Model.Proveedor.Nombre} {Model.Proveedor.Apellido}".Trim();
+
+    // Aviso de prioridad: colores según la prioridad elegida.
+    var (prioFondo, prioBorde, prioTexto, prioPunto) = Model.Prioridad switch
+    {
+        Prioridad.Alta => ("#f8d7da", "#f1aeb5", "#842029", "#dc3545"),
+        Prioridad.Media => ("#fff8e1", "#ffe08a", "#664d03", "#e0a800"),
+        Prioridad.Baja => ("#d1e7dd", "#a3cfbb", "#0f5132", "#198754"),
+        _ => ("#f8f9fa", "#dee2e6", "#495057", "#adb5bd")
+    };
+    string? haceCuanto = null;
+    if (Model.FechaReclamo is DateTime reclamo)
+    {
+        var dias = (DateTime.Today - reclamo.Date).Days;
+        if (dias == 0) haceCuanto = "reclamada hoy";
+        else if (dias == 1) haceCuanto = "reclamada hace 1 día";
+        else if (dias > 1) haceCuanto = $"reclamada hace {dias} días";
+    }
 }
 
-<h1>Details</h1>
+<style>
+    .detalle-barra { background: #fff; border: 1px solid #dee2e6; border-radius: .75rem; }
+    .detalle-foto-principal { width: 100%; height: 520px; object-fit: cover; border-radius: .75rem; display: block; background: #dfe3e8; }
+    .detalle-foto-vacia { height: 320px; border-radius: .75rem; background: #e9ecef; color: #6c757d; display: flex; align-items: center; justify-content: center; }
+    .detalle-contador { position: absolute; left: 1rem; bottom: 1rem; background: rgba(33,37,41,.75); color: #fff; border-radius: .4rem; padding: .2rem .6rem; font-size: .875rem; }
+    .detalle-miniatura { width: 140px; height: 92px; object-fit: cover; border-radius: .5rem; border: 3px solid transparent; cursor: pointer; padding: 0; background: none; }
+    .detalle-miniatura img { width: 100%; height: 100%; object-fit: cover; border-radius: .3rem; display: block; }
+    .detalle-miniatura.activa { border-color: #0d6efd; }
+    .detalle-panel { background: #fff; border: 1px solid #dee2e6; border-radius: .75rem; padding: 1.5rem; }
+    .detalle-seccion { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #5c636a; margin: 0 0 .25rem; }
+    .detalle-fila { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem 0; border-bottom: 1px solid #eef0f2; }
+    .detalle-fila:last-child { border-bottom: 0; }
+    .detalle-fila .k { color: #5c636a; }
+    .detalle-fila .v { font-weight: 600; text-align: right; }
+    .detalle-fila .v.vacio { font-weight: 400; color: #6c757d; }
+</style>
 
-<div>
-    <h4>Vereda</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Apellido)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Apellido)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Calle)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Calle)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EntreCalle1)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EntreCalle1)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EntreCalle2)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EntreCalle2)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Altura)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Altura)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Ubicacion)
-        </dt>
-        <dd class = "col-sm-10">
-            <partial name="_VistaMapa" model="Model" />
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Observacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Observacion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaReclamo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaReclamo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaRelevo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaRelevo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Fotos)
-        </dt>
-        <dd class = "col-sm-10">
-            @if (Model.ListaFotos.Any())
+@* Barra superior: dirección, estado y acciones *@
+<div class="detalle-barra d-flex flex-wrap align-items-center gap-3 px-4 py-3 mb-4">
+    <a asp-action="Index" class="text-decoration-none text-secondary">&larr; Veredas</a>
+    <span class="vr"></span>
+    <h1 class="h4 mb-0 fw-bold">@Model.Direccion</h1>
+    @if (entreCalles != null)
+    {
+        <span class="text-secondary">entre @entreCalles</span>
+    }
+    <span class="badge rounded-pill fs-6 fw-semibold @Model.Estado.BadgeClass()">@Model.Estado.GetDisplayName()</span>
+    <div class="ms-auto d-flex gap-2">
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Eliminar</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary px-4">Editar</a>
+    </div>
+</div>
+
+<div class="row g-4">
+    @* Izquierda: fotos protagonistas, debajo mapa y Street View *@
+    <div class="col-12 col-xl-8 d-flex flex-column gap-3">
+        @if (fotos.Any())
+        {
+            <div class="position-relative">
+                <a id="fotoPrincipalLink" href="~/@fotos[0]" target="_blank" rel="noopener" title="Abrir la foto en tamaño completo">
+                    <img id="fotoPrincipal" src="~/@fotos[0]" class="detalle-foto-principal" alt="Foto de la vereda en @Model.Direccion" />
+                </a>
+                <span id="fotoContador" class="detalle-contador">Foto 1 de @fotos.Count</span>
+            </div>
+            @if (fotos.Count > 1)
             {
                 <div class="d-flex flex-wrap gap-2">
-                    @foreach (var foto in Model.ListaFotos)
+                    @for (var i = 0; i < fotos.Count; i++)
                     {
-                        <a href="~/@foto" target="_blank">
-                            <img src="~/@foto" class="rounded border" style="width:160px;height:120px;object-fit:cover" alt="Foto de la vereda" />
-                        </a>
+                        <button type="button" class="detalle-miniatura @(i == 0 ? "activa" : "")"
+                                data-src="@Url.Content("~/" + fotos[i])" data-indice="@(i + 1)"
+                                aria-label="Ver foto @(i + 1)">
+                            <img src="~/@fotos[i]" alt="" loading="lazy" />
+                        </button>
                     }
                 </div>
             }
-            else
-            {
-                <span class="text-muted">Sin fotos</span>
-            }
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Prioridad)
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.Prioridad.GetDisplayName()
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.Estado.GetDisplayName()
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ACargoFrentista)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ACargoFrentista)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Proveedor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Proveedor.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Paquete)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Paquete.Nombre)
-        </dd>
-    </dl>
+        }
+        else
+        {
+            <div class="detalle-foto-vacia">
+                <div class="text-center">
+                    <div class="mb-2">Esta vereda todavía no tiene fotos.</div>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">Agregar fotos</a>
+                </div>
+            </div>
+        }
+
+        <div class="mt-2">
+            <partial name="_VistaMapa" model="Model" />
+        </div>
+    </div>
+
+    @* Derecha: datos agrupados *@
+    <div class="col-12 col-xl-4">
+        <aside class="detalle-panel d-flex flex-column gap-4">
+
+            <div class="d-flex align-items-center gap-2 rounded-3 px-3 py-2"
+                 style="background:@prioFondo;border:1px solid @prioBorde;color:@prioTexto">
+                <span class="rounded-circle flex-shrink-0" style="width:10px;height:10px;background:@prioPunto"></span>
+                <span>
+                    <strong>@(Model.Prioridad == null ? "Sin prioridad" : $"Prioridad {Model.Prioridad.GetDisplayName().ToLower()}")</strong>
+                    @if (haceCuanto != null)
+                    {
+                        <text> &middot; @haceCuanto</text>
+                    }
+                </span>
+            </div>
+
+            <div>
+                <p class="detalle-seccion">Vecino</p>
+                <div class="detalle-fila">
+                    <span class="k">Nombre</span>
+                    <span class="v @(string.IsNullOrEmpty(vecino) ? "vacio" : "")">@(string.IsNullOrEmpty(vecino) ? "Sin datos" : vecino)</span>
+                </div>
+            </div>
+
+            <div>
+                <p class="detalle-seccion">Dirección</p>
+                <div class="detalle-fila"><span class="k">Calle</span><span class="v">@Model.Calle</span></div>
+                <div class="detalle-fila">
+                    <span class="k">Altura</span>
+                    <span class="v @(string.IsNullOrWhiteSpace(Model.Altura) ? "vacio" : "")">@(string.IsNullOrWhiteSpace(Model.Altura) ? "—" : Model.Altura)</span>
+                </div>
+                <div class="detalle-fila">
+                    <span class="k">Entre calles</span>
+                    <span class="v @(entreCalles == null ? "vacio" : "")">@(entreCalles ?? "—")</span>
+                </div>
+            </div>
+
+            <div>
+                <p class="detalle-seccion">Seguimiento</p>
+                <div class="detalle-fila">
+                    <span class="k">Fecha de reclamo</span>
+                    <span class="v @(Model.FechaReclamo == null ? "vacio" : "")">@(Model.FechaReclamo?.ToString("dd/MM/yyyy") ?? "—")</span>
+                </div>
+                <div class="detalle-fila">
+                    <span class="k">Fecha de relevo</span>
+                    <span class="v @(Model.FechaRelevo == null ? "vacio" : "")">@(Model.FechaRelevo?.ToString("dd/MM/yyyy") ?? "—")</span>
+                </div>
+            </div>
+
+            <div>
+                <p class="detalle-seccion">Reparación</p>
+                <div class="detalle-fila"><span class="k">A cargo del frentista</span><span class="v">@(Model.ACargoFrentista ? "Sí" : "No")</span></div>
+                <div class="detalle-fila">
+                    <span class="k">Proveedor</span>
+                    <span class="v @(string.IsNullOrEmpty(proveedor) ? "vacio" : "")">@(Model.ACargoFrentista ? "No corresponde" : string.IsNullOrEmpty(proveedor) ? "Sin asignar" : proveedor)</span>
+                </div>
+                <div class="detalle-fila">
+                    <span class="k">Paquete</span>
+                    <span class="v @(Model.Paquete == null ? "vacio" : "")">@(Model.Paquete?.Nombre ?? "Sin paquete")</span>
+                </div>
+            </div>
+
+            <div>
+                <p class="detalle-seccion">Medición</p>
+                @if (!Model.EstaMedida)
+                {
+                    <div class="detalle-fila">
+                        <span class="k">Estado de medición</span>
+                        <span class="v vacio">Sin medir</span>
+                    </div>
+                }
+                else
+                {
+                    foreach (var r in Model.Roturas.OrderBy(r => r.Orden))
+                    {
+                        <div class="detalle-fila">
+                            <span class="k">Pozo @r.Orden</span>
+                            <span class="v">
+                                @MedicionService.FormatearM2(r.SubtotalM2)
+                                <span class="d-block small text-secondary fw-normal">@(r.Medidas.Replace("*", " × ")) &middot; @(r.TipoSuelo?.Descripcion ?? "—")</span>
+                            </span>
+                        </div>
+                    }
+                    <div class="detalle-fila">
+                        <span class="k">Total m²</span>
+                        <span class="v @(Model.TotalM2 == null ? "vacio" : "fw-bold")">@(MedicionService.FormatearM2(Model.TotalM2) ?? "Sin medir")</span>
+                    </div>
+                    if (Model.TieneCordon)
+                    {
+                        <div class="detalle-fila">
+                            <span class="k">Cordón</span>
+                            <span class="v @(Model.TotalCordonM3 == null ? "vacio" : "")">
+                                @(MedicionService.FormatearM3(Model.TotalCordonM3) ?? "Sin medir")
+                                @if (!string.IsNullOrWhiteSpace(Model.MedicionCordon))
+                                {
+                                    <span class="d-block small text-secondary fw-normal">@Model.MedicionCordon</span>
+                                }
+                            </span>
+                        </div>
+                    }
+                }
+            </div>
+
+            <div>
+                <p class="detalle-seccion">Observación</p>
+                @if (string.IsNullOrWhiteSpace(Model.Observacion))
+                {
+                    <p class="mb-0 text-secondary">Sin observaciones.</p>
+                }
+                else
+                {
+                    <p class="mb-0 mt-1 p-3 rounded-3 bg-light" style="white-space:pre-line;line-height:1.55">@Model.Observacion</p>
+                }
+            </div>
+        </aside>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+@if (fotos.Count > 1)
+{
+    <script>
+        // Al tocar una miniatura se muestra como foto principal.
+        document.querySelectorAll('.detalle-miniatura').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.getElementById('fotoPrincipal').src = btn.dataset.src;
+                document.getElementById('fotoPrincipalLink').href = btn.dataset.src;
+                document.getElementById('fotoContador').textContent = 'Foto ' + btn.dataset.indice + ' de @fotos.Count';
+                document.querySelectorAll('.detalle-miniatura').forEach(function (b) { b.classList.remove('activa'); });
+                btn.classList.add('activa');
+            });
+        });
+    </script>
+}

@@ -9,7 +9,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,
 initial-scale=1.0" />
-    <title>@ViewBag.Title - WebTech</title>
+    <title>@ViewBag.Title - SistemaVeredas</title>
     <link rel="stylesheet"
           href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet"
@@ -194,9 +194,6 @@ initial-scale=1.0" />
 </head>
 <body>
     <div class="container">
-        <div class="logo-container">
-            <img src="~/css/image/logo.png" alt="Logo ISFDyT N°124">
-        </div>
         <div class="card">
             <div class="card-header text-center">
                 <h3 class="m-0">Restablecer Contraseña</h3>
@@ -269,10 +266,7 @@ initial-scale=1.0" />
                     <div class="password-rules">
                         <strong>Requisitos de la contraseña:</strong>
                         <ul>
-                            <li>Mínimo 8 caracteres</li>
-                            <li>Al menos una letra mayúscula</li>
-                            <li>Al menos un número</li>
-                            <li>Al menos un carácter especial</li>
+                            <li>Entre 8 y 50 caracteres.</li>
                         </ul>
                     </div>
 
@@ -292,6 +286,7 @@ initial-scale=1.0" />
     </div>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <partial name="_ValidationScriptsPartial" />
     <script>
 
         function togglePassword(inputId, iconId) {
@@ -313,7 +308,7 @@ initial-scale=1.0" />
                 <text>
                 Swal.fire({
                 title: 'Error',
-                text: '@Html.Raw(TempData["Error"])',
+                text: @Json.Serialize(TempData["Error"]),
                 icon: 'error',
                 confirmButtonText: 'Aceptar'
                 });

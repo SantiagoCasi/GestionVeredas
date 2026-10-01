@@ -12,7 +12,7 @@ namespace SistemaVeredas.Data
         }
 
         public DbSet<Vereda> Veredas { get; set; }
-        public DbSet<Medicion> Mediciones { get; set; }
+        public DbSet<Rotura> Roturas { get; set; }
         public DbSet<TipoSuelo> TiposSuelo { get; set; }
         public DbSet<Proveedor> Proveedores { get; set; }
         public DbSet<Paquete> Paquetes { get; set; }
@@ -55,18 +55,16 @@ namespace SistemaVeredas.Data
                 .HasForeignKey(v => v.PaqueteId)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            // Vereda 1—N Medicion: al borrar una vereda se borran sus mediciones.
-            modelBuilder.Entity<Medicion>()
-                .HasOne(m => m.Vereda)
-                .WithMany(v => v.Mediciones)
-                .HasForeignKey(m => m.VeredaId)
+            // Vereda 1—N Rotura: al borrar una vereda se borran sus roturas.
+            modelBuilder.Entity<Rotura>()
+                .HasOne(r => r.Vereda).WithMany(v => v.Roturas)
+                .HasForeignKey(r => r.VeredaId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // TipoSuelo 1—N Medicion: no se puede borrar un tipo de suelo en uso.
-            modelBuilder.Entity<Medicion>()
-                .HasOne(m => m.TipoSuelo)
-                .WithMany(t => t.Mediciones)
-                .HasForeignKey(m => m.TipoSueloId)
+            // TipoSuelo 1—N Rotura: no se puede borrar un tipo de suelo en uso (RN-13).
+            modelBuilder.Entity<Rotura>()
+                .HasOne(r => r.TipoSuelo).WithMany(t => t.Roturas)
+                .HasForeignKey(r => r.TipoSueloId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

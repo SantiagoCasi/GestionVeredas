@@ -1,0 +1,119 @@
+@model SistemaVeredas.Models.ViewModels.AgregarVeredasViewModel
+
+@{
+    ViewData["Title"] = $"Agregar veredas a «{Model.PaqueteNombre}»";
+    var cantMedidas = Model.Veredas.Count(v => v.EstaMedida);
+    var cantSinMedir = Model.Veredas.Count - cantMedidas;
+}
+
+<div class="mb-3">
+    <a asp-action="Details" asp-route-id="@Model.PaqueteId" class="small text-decoration-none">&larr; Volver al paquete</a>
+    <h1 class="h3 mb-0">Agregar veredas a «@Model.PaqueteNombre»</h1>
+</div>
+
+<div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+@if (!Model.Veredas.Any())
+{
+    <div class="empty-state">
+        <p class="mb-2">No hay veredas sin paquete. Podés cargar una nueva desde Veredas.</p>
+        <a asp-controller="Veredas" asp-action="Create" class="btn btn-primary btn-sm">+ Nueva vereda</a>
+        <a asp-action="Details" asp-route-id="@Model.PaqueteId" class="btn btn-outline-secondary btn-sm">Volver al paquete</a>
+    </div>
+}
+else
+{
+    <div class="row g-2 mb-3">
+        <div class="col-12 col-md-6">
+            <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por dirección o entre calles…" aria-label="Buscar" />
+        </div>
+        <div class="col-12 col-md-3">
+            <select id="filtroEstado" class="form-select" aria-label="Filtrar por estado">
+                <option value="">Todos los estados</option>
+                @foreach (var e in Enum.GetValues<Estado>())
+                {
+                    <option value="@e">@e.GetDisplayName()</option>
+                }
+            </select>
+        </div>
+        <div class="col-12 col-md-3">
+            <select id="filtroMedicion" class="form-select" aria-label="Filtrar por medición">
+                <option value="">Medidas y sin medir</option>
+                <option value="si">Medidas (@cantMedidas)</option>
+                <option value="no">Sin medir (@cantSinMedir)</option>
+            </select>
+        </div>
+    </div>
+
+    <form method="post" asp-action="AgregarVeredas" asp-route-id="@Model.PaqueteId" data-fila-clicable="si">
+        <div class="table-responsive bg-white rounded-3 shadow-sm">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:2.5rem">
+                            <input type="checkbox" id="seleccionarTodas" class="form-check-input" aria-label="Seleccionar todas" />
+                        </th>
+                        <th>Dirección</th>
+                        <th>Estado</th>
+                        <th>Prioridad</th>
+                        <th>Medición</th>
+                        <th>Fecha de reclamo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var v in Model.Veredas)
+                    {
+                        var totalesMedicion = string.Join(" · ", new[] { MedicionService.FormatearM2(v.TotalM2), MedicionService.FormatearM3(v.TotalCordonM3) }
+                            .Where(x => x != null));
+                        <tr class="fila-vereda" style="cursor:pointer" data-estado="@v.Estado" data-medida="@(v.EstaMedida ? "si" : "no")" data-texto="@v.TextoBusqueda">
+                            <td>
+                                <input type="checkbox" class="form-check-input sel-vereda" name="veredaIds" value="@v.Id"
+                                       id="@($"vereda_{v.Id}")" aria-label="@($"Elegir {v.Direccion}")" />
+                            </td>
+                            <td>
+                                <label for="@($"vereda_{v.Id}")" class="fw-semibold mb-0" style="cursor:pointer">@v.Direccion</label>
+                                @if (v.EntreCalles != null)
+                                {
+                                    <div class="small text-muted">@v.EntreCalles</div>
+                                }
+                            </td>
+                            <td><span class="badge @v.Estado.BadgeClass()">@v.Estado.GetDisplayName()</span></td>
+                            <td>
+                                @if (v.Prioridad != null)
+                                {
+                                    <span class="badge @v.Prioridad.BadgeClass()">@v.Prioridad.GetDisplayName()</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td class="text-nowrap">
+                                @if (v.EstaMedida)
+                                {
+                                    <span class="badge text-bg-success">Medida</span>
+                                    <div class="small text-muted mt-1">@totalesMedicion</div>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-light border text-secondary">Sin medir</span>
+                                }
+                            </td>
+                            <td class="text-nowrap">@(v.FechaReclamo?.ToString("dd/MM/yyyy") ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div id="sinResultados" class="empty-state d-none mt-3">No hay veredas que coincidan con la búsqueda.</div>
+
+        <div class="sticky-bottom bg-white border rounded-3 shadow-sm p-3 mt-3 d-flex align-items-center justify-content-between gap-2">
+            <span class="fw-semibold contador-seleccion">0 seleccionadas</span>
+            <button type="submit" class="btn btn-primary btn-agregar-seleccion" disabled>Agregar al paquete</button>
+        </div>
+    </form>
+}
+
+@section Scripts {
+    <script src="~/js/seleccion-veredas.js" asp-append-version="true"></script>
+}

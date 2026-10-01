@@ -20,14 +20,15 @@ namespace SistemaVeredas.Models.ViewModels
         [Display(Name = "Email")]
         public string UsEmail { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "La contraseña es obligatoria")]
-        [StringLength(100, MinimumLength = 8, ErrorMessage = "Mínimo 8 caracteres")]
+        // Largo de la contraseña que escribe el usuario (RN-16). La columna guarda el hash.
+        [Required(ErrorMessage = "Escribí la contraseña.")]
+        [StringLength(50, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 50 caracteres.")]
         [DataType(DataType.Password)]
         [Display(Name = "Contraseña")]
         public string UsContrasena { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Confirme la contraseña")]
-        [Compare(nameof(UsContrasena), ErrorMessage = "Las contraseñas no coinciden")]
+        [Required(ErrorMessage = "Repetí la contraseña.")]
+        [Compare(nameof(UsContrasena), ErrorMessage = "Las contraseñas no coinciden.")]
         [DataType(DataType.Password)]
         [Display(Name = "Confirmar contraseña")]
         public string ConfirmarContrasena { get; set; } = string.Empty;

@@ -1,6 +1,13 @@
 ﻿@model SistemaVeredas.Models.ViewModels.HomeViewModel
 @{
     ViewData["Title"] = "Página principal";
+
+    // "12,50 m² medidos" y, si hay, " · 0,450 m³ de cordón".
+    var subtituloVeredas = $"veredas cargadas · {MedicionService.FormatearM2(Model.SuperficieTotal)} medidos";
+    if (Model.CordonTotalM3 > 0)
+    {
+        subtituloVeredas += $" · {MedicionService.FormatearM3(Model.CordonTotalM3)} de cordón";
+    }
 }
 
 <div class="mb-4">
@@ -19,7 +26,7 @@
             </div>
             <h2 class="home-tile-title">Veredas</h2>
             <div class="home-tile-number">@Model.TotalVeredas</div>
-            <div class="home-tile-sub">veredas cargadas &middot; @Model.SuperficieTotal.ToString("N2") m² medidos</div>
+            <div class="home-tile-sub">@subtituloVeredas</div>
             <div class="home-tile-stats">
                 <div><strong>@Model.VeredasPendientes</strong><span>Pendientes</span></div>
                 <div><strong>@Model.VeredasEnProceso</strong><span>En proceso</span></div>

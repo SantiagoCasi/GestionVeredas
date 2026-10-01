@@ -1,0 +1,111 @@
+@* Medición de la vereda para Crear/Editar (SPEC-001).
+   Lee ViewData["TiposSuelo"] (List<SelectListItem>) y ViewData["Roturas"] (List<RoturaFilaViewModel>).
+   Los renglones los dibuja el servidor y después wwwroot/js/medicion-vereda.js los vuelve a armar en vivo. *@
+@model SistemaVeredas.Models.Vereda
+@using SistemaVeredas.Models.ViewModels
+@{
+    var tipos = ViewData["TiposSuelo"] as List<SelectListItem> ?? new List<SelectListItem>();
+    var tiposNuevos = ViewData["TiposSueloNuevos"] as List<SelectListItem> ?? tipos;
+    var filas = ViewData["Roturas"] as List<RoturaFilaViewModel> ?? new List<RoturaFilaViewModel>();
+    var tieneCordon = Model?.TieneCordon == true;
+
+    var erroresMedicion = ViewData.ModelState["Medicion"]?.Errors.Select(e => e.ErrorMessage).ToList() ?? new List<string>();
+    var erroresCordon = ViewData.ModelState["MedicionCordon"]?.Errors.Select(e => e.ErrorMessage).ToList() ?? new List<string>();
+
+    var subtotales = filas.Where(f => f.SubtotalM2 != null).Select(f => f.SubtotalM2!.Value).ToList();
+    var totalTexto = subtotales.Count > 0 && subtotales.Count == filas.Count
+        ? MedicionService.FormatearM2(subtotales.Sum())
+        : "—";
+    var cordonTexto = MedicionService.FormatearM3(Model?.TotalCordonM3) ?? "—";
+}
+
+<fieldset class="medicion-vereda border rounded-3 p-3 my-3">
+    <legend class="float-none w-auto px-2 fs-6 fw-semibold mb-0">Medición <span class="text-muted fw-normal">(opcional)</span></legend>
+
+    <div class="alert alert-danger py-2 small d-none medicion-aviso" role="alert"></div>
+
+    <div class="form-group mb-2">
+        <label asp-for="Medicion" class="control-label"></label>
+        <input asp-for="Medicion" class="form-control medicion-input" placeholder="(2*3)+(5*9)" maxlength="500" autocomplete="off" />
+        <div class="form-text">Escribí cada pozo como largo × ancho en metros y sumalos: (2*3)+(5*9). Podés usar coma o punto decimal y «x» en lugar de «*». Después elegí el tipo de suelo de cada pozo.</div>
+        <div class="text-danger small medicion-errores">
+            @foreach (var e in erroresMedicion)
+            {
+                <div>@e</div>
+            }
+        </div>
+    </div>
+
+    @if (!tiposNuevos.Any())
+    {
+        <div class="alert alert-warning py-2 small mb-2">Todavía no hay tipos de suelo disponibles. Podés agregar uno con «+ Nuevo» en cada pozo.</div>
+    }
+
+    <div class="roturas mb-2">
+        @for (var i = 0; i < filas.Count; i++)
+        {
+            var f = filas[i];
+            var errorTipo = ViewData.ModelState[$"tiposRotura[{i}]"]?.Errors.FirstOrDefault()?.ErrorMessage;
+            var medidasTexto = f.Medidas == null
+                ? string.Empty
+                : f.Medidas.Replace("*", " × ") + " = " + MedicionService.FormatearM2(f.SubtotalM2);
+            <div class="rotura-fila row g-2 align-items-start py-1 border-bottom" data-indice="@i">
+                <div class="col-auto fw-semibold pt-1">Pozo @(i + 1)</div>
+                <div class="col-12 col-md-4 pt-1 rotura-medidas">@medidasTexto</div>
+                <div class="col">
+                    <select name="tiposRotura[@i]" id="@($"tiposRotura_{i}")" class="form-select form-select-sm rotura-tipo" aria-label="@($"Tipo de suelo del pozo {i + 1}")">
+                        <option value="">-- Elegí el tipo de suelo --</option>
+                        @foreach (var t in tipos)
+                        {
+                            <option value="@t.Value" selected="@(t.Value == f.TipoSueloId?.ToString())">@t.Text</option>
+                        }
+                    </select>
+                    <span class="text-danger small d-block rotura-error" data-valmsg-for="tiposRotura[@i]">@errorTipo</span>
+                    <span class="text-success small d-block rotura-info"></span>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rotura-nuevo" data-destino="@i">+ Nuevo</button>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="fw-semibold">Total</span>
+        <output class="medicion-total fw-semibold">@totalTexto</output>
+    </div>
+
+    <div class="form-check mb-2">
+        <input asp-for="TieneCordon" class="form-check-input cordon-check" />
+        <label asp-for="TieneCordon" class="form-check-label"></label>
+    </div>
+
+    <div class="cordon-bloque @(tieneCordon ? "" : "d-none")">
+        <div class="form-group mb-2">
+            <label asp-for="MedicionCordon" class="control-label"></label>
+            <input asp-for="MedicionCordon" class="form-control cordon-input" placeholder="(5*0,15*0,30)" maxlength="500" autocomplete="off" />
+            <div class="form-text">Cada rotura lleva largo × ancho × alto, en metros.</div>
+            <div class="text-danger small cordon-errores">
+                @foreach (var e in erroresCordon)
+                {
+                    <div>@e</div>
+                }
+            </div>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Total cordón</span>
+            <output class="cordon-total fw-semibold">@cordonTexto</output>
+        </div>
+    </div>
+
+    @* Plantilla del desplegable para los renglones nuevos. *@
+    <template class="plantilla-tipos">
+        <select class="form-select form-select-sm rotura-tipo">
+            <option value="">-- Elegí el tipo de suelo --</option>
+            @foreach (var t in tiposNuevos)
+            {
+                <option value="@t.Value">@t.Text</option>
+            }
+        </select>
+    </template>
+</fieldset>

@@ -1,42 +1,140 @@
-﻿@model SistemaVeredas.Models.Paquete
+﻿@model SistemaVeredas.Models.ViewModels.PaqueteDetalleViewModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = $"Paquete {Model.Nombre}";
+    var t = Model.Totales;
 }
 
-<h1>Details</h1>
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-3">
+    <div>
+        <a asp-action="Index" class="small text-decoration-none">&larr; Paquetes</a>
+        <h1 class="h3 mb-0">@Model.Nombre</h1>
+        <div class="text-muted">
+            @Model.Fecha.ToString("dd/MM/yyyy") &middot;
+            @(string.IsNullOrEmpty(Model.ProveedorNombre) ? "Sin proveedor" : Model.ProveedorNombre)
+        </div>
+        @if (!string.IsNullOrWhiteSpace(Model.Observacion))
+        {
+            <p class="mb-0 mt-2 text-secondary" style="white-space:pre-line">@Model.Observacion</p>
+        }
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="AgregarVeredas" asp-route-id="@Model.Id" class="btn btn-primary">Agregar veredas</a>
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Editar</a>
+        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Eliminar</a>
+    </div>
+</div>
 
-<div>
-    <h4>Paquete</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Fecha)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Fecha)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Proveedor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Proveedor.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Observacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Observacion)
-        </dd>
-    </dl>
+<div class="row g-3 mb-2">
+    <div class="col-6 col-lg-3">
+        <div class="mini-stat bg-white rounded-3 shadow-sm p-3 text-center">
+            <strong>@t.Cantidad</strong><span>Veredas</span>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="mini-stat bg-white rounded-3 shadow-sm p-3 text-center">
+            <strong>@MedicionService.FormatearNumero(t.TotalM2, 2)</strong><span>m²</span>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="mini-stat bg-white rounded-3 shadow-sm p-3 text-center">
+            <strong>@MedicionService.FormatearNumero(t.TotalM3, 3)</strong><span>m³</span>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="mini-stat bg-white rounded-3 shadow-sm p-3">
+            <div class="d-flex justify-content-between">
+                <span>Avance</span><strong class="d-inline fs-6">@t.PorcentajeAvance %</strong>
+            </div>
+            <div class="progress my-1" role="progressbar" aria-valuenow="@t.PorcentajeAvance" aria-valuemin="0" aria-valuemax="100" style="height:8px">
+                <div class="progress-bar bg-success" style="width:@(t.PorcentajeAvance)%"></div>
+            </div>
+            <span>@t.Finalizadas de @t.Cantidad finalizadas</span>
+        </div>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+@if (t.SinMedir > 0)
+{
+    <p class="small text-muted mb-3">@t.SinMedir sin medir: no suman a los totales.</p>
+}
+
+@if (!Model.Veredas.Any())
+{
+    <div class="empty-state mt-3">
+        <p class="mb-2">Este paquete todavía no tiene veredas. Agregá las que van en él.</p>
+        <a asp-action="AgregarVeredas" asp-route-id="@Model.Id" class="btn btn-primary btn-sm">Agregar veredas</a>
+    </div>
+}
+else
+{
+    <div class="table-responsive bg-white rounded-3 shadow-sm mt-3">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Foto</th>
+                    <th>Dirección</th>
+                    <th>Estado</th>
+                    <th>Prioridad</th>
+                    <th>Medición</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var v in Model.Veredas)
+                {
+                    var totalesMedicion = string.Join(" · ", new[] { MedicionService.FormatearM2(v.TotalM2), MedicionService.FormatearM3(v.TotalCordonM3) }
+                        .Where(x => x != null));
+                    <tr>
+                        <td>
+                            @if (v.FotoMiniatura != null)
+                            {
+                                <img src="~/@v.FotoMiniatura" class="foto-mini" alt="Foto de @v.Direccion" loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="foto-mini foto-mini-vacia">Sin foto</div>
+                            }
+                        </td>
+                        <td>
+                            <a asp-controller="Veredas" asp-action="Details" asp-route-id="@v.Id" class="fw-semibold text-decoration-none">@v.Direccion</a>
+                            @if (v.EntreCalles != null)
+                            {
+                                <div class="small text-muted">@v.EntreCalles</div>
+                            }
+                        </td>
+                        <td><span class="badge @v.Estado.BadgeClass()">@v.Estado.GetDisplayName()</span></td>
+                        <td>
+                            @if (v.Prioridad != null)
+                            {
+                                <span class="badge @v.Prioridad.BadgeClass()">@v.Prioridad.GetDisplayName()</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td class="text-nowrap">
+                            @if (v.EstaMedida)
+                            {
+                                <span class="badge text-bg-success">Medida</span>
+                                <div class="small text-muted mt-1">@totalesMedicion</div>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-light border text-secondary">Sin medir</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <form method="post" asp-action="QuitarVereda" asp-route-id="@Model.Id" class="d-inline"
+                                  data-confirmar="@($"¿Quitar {v.Direccion} de este paquete? La vereda no se borra: queda sin paquete.")"
+                                  onsubmit="return confirm(this.dataset.confirmar);">
+                                <input type="hidden" name="veredaId" value="@v.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Quitar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

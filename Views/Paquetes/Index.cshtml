@@ -1,15 +1,16 @@
 ﻿@model IEnumerable<SistemaVeredas.Models.Paquete>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Paquetes";
+    var cantidades = ViewData["CantidadVeredas"] as Dictionary<int, int> ?? new Dictionary<int, int>();
 }
 
-<h1>Index</h1>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+    <h1 class="h3 mb-0">Paquetes</h1>
+    <a asp-action="Create" class="btn btn-primary btn-sm">+ Nuevo paquete</a>
+</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
+<table class="table align-middle">
     <thead>
         <tr>
             <th>
@@ -21,6 +22,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Proveedor)
             </th>
+            <th>Veredas</th>
             <th>
                 @Html.DisplayNameFor(model => model.Observacion)
             </th>
@@ -31,21 +33,25 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Nombre)
+                <a asp-action="Details" asp-route-id="@item.Id" class="fw-semibold text-decoration-none">@item.Nombre</a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Fecha)
+                @item.Fecha.ToString("dd/MM/yyyy")
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Proveedor.Nombre)
+                @Html.DisplayFor(modelItem => item.Proveedor!.Nombre)
+            </td>
+            <td>
+                @(cantidades.TryGetValue(item.Id, out var cantidad) ? cantidad : 0)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Observacion)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            <td class="text-nowrap">
+                <a asp-action="AgregarVeredas" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Agregar veredas</a>
+                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Ver</a>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Eliminar</a>
             </td>
         </tr>
 }

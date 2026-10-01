@@ -12,6 +12,10 @@
         public int VeredasEnPaquetes { get; set; }
         public int VeredasSinPaquete { get; set; }
 
+        // Suma de Veredas.TotalM2.
         public decimal SuperficieTotal { get; set; }
+
+        // Suma de Veredas.TotalCordonM3.
+        public decimal CordonTotalM3 { get; set; }
     }
 }

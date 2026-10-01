@@ -17,4 +17,15 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="9.0.12" />
   </ItemGroup>
 
+  <!-- El proyecto de pruebas está en una subcarpeta: no se compila ni se publica con la app (SPEC-004). -->
+  <ItemGroup>
+    <Compile Remove="SistemaVeredas.Tests\**" />
+    <Content Remove="SistemaVeredas.Tests\**" />
+    <EmbeddedResource Remove="SistemaVeredas.Tests\**" />
+    <None Remove="SistemaVeredas.Tests\**" />
+
+    <Content Remove="TestResults\**" />
+    <None Remove="TestResults\**" />
+  </ItemGroup>
+
 </Project>

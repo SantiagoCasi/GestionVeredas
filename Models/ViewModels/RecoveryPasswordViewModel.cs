@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations; // Importa atributos para validación de datos 
+﻿using System.ComponentModel.DataAnnotations; // Importa atributos para validación de datos
 
 
 namespace SistemaVeredas.Models.ViewModels // Define el espacio de nombres para modelos de vista
@@ -8,11 +8,19 @@ namespace SistemaVeredas.Models.ViewModels // Define el espacio de nombres para 
         public string? token { get; set; } // Token enviado para validar la recuperación(puede ser nulo)
 
 
-        [Required] // UsContrasena es obligatorio 
-        public string? UsContrasena { get; set; } // Nueva contraseña que el usuario quiere establecer(puede ser nulo pero obligatorio)
+        // Nueva contraseña: de 8 a 50 caracteres (RN-16).
+        [Required(ErrorMessage = "Escribí la nueva contraseña.")]
+        [StringLength(50, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 50 caracteres.")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Nueva contraseña")]
+        public string? UsContrasena { get; set; }
 
 
-        [Required] // UsContrasena2 es obligatorio 
-        public string? UsContrasena2 { get; set; } // Confirmación de la contraseña nueva, obligatoria
+        // Confirmación de la contraseña nueva.
+        [Required(ErrorMessage = "Repetí la nueva contraseña.")]
+        [Compare(nameof(UsContrasena), ErrorMessage = "Las contraseñas no coinciden.")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Repetí la contraseña")]
+        public string? UsContrasena2 { get; set; }
     }
 }

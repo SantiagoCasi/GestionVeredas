@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = "Delete";
+
+    // RN-13: si alguna vereda lo usa, no se elimina: se marca como no disponible.
+    var enUso = ViewData["VeredasQueLoUsan"] as int? ?? 0;
+    var textoVeredas = enUso == 1 ? "1 vereda" : $"{enUso} veredas";
 }
 
 <h1>Delete</h1>
@@ -37,9 +41,16 @@
         </dd>
     </dl>
     
+    @if (enUso > 0)
+    {
+        <div class="alert alert-warning">
+            Este tipo de suelo lo usan @textoVeredas, así que no se puede eliminar. Si ya no se consigue, marcalo como no disponible.
+        </div>
+    }
+
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <input type="submit" value="@(enUso > 0 ? "Marcar como no disponible" : "Delete")" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>

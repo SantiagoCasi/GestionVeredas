@@ -25,13 +25,13 @@ namespace SistemaVeredas.Models.ViewModels
         [Display(Name = "Activo")]
         public bool UsActivo { get; set; }
 
-        // Opcional: si se deja vacía, se mantiene la contraseña actual.
-        [StringLength(100, MinimumLength = 8, ErrorMessage = "Mínimo 8 caracteres")]
+        // Opcional: si se deja vacía, se mantiene la contraseña actual (RN-16: 8 a 50 caracteres).
+        [StringLength(50, MinimumLength = 8, ErrorMessage = "La contraseña debe tener entre 8 y 50 caracteres.")]
         [DataType(DataType.Password)]
         [Display(Name = "Nueva contraseña (opcional)")]
         public string? NuevaContrasena { get; set; }
 
-        [Compare(nameof(NuevaContrasena), ErrorMessage = "Las contraseñas no coinciden")]
+        [Compare(nameof(NuevaContrasena), ErrorMessage = "Las contraseñas no coinciden.")]
         [DataType(DataType.Password)]
         [Display(Name = "Confirmar nueva contraseña")]
         public string? ConfirmarContrasena { get; set; }

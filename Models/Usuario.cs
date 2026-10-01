@@ -27,13 +27,17 @@ namespace SistemaVeredas.Models
 
         // Siempre se guarda hasheada con PasswordService.
         [Required]
-        [StringLength(10)]
+        [StringLength(100)]
         public string UsContrasena { get; set; } = null!;
 
         [Display(Name = "Activo")]
         public bool UsActivo { get; set; } = true;
 
-        public string? token_recovery { get; set; } = "tokenbloqueado";
+        // Valor que indica que no hay un pedido de recuperación vigente. Nunca es un token válido:
+        // AccessController solo acepta tokens de 32 caracteres hexadecimales.
+        public const string TokenBloqueado = "tokenbloqueado";
+
+        public string? token_recovery { get; set; } = TokenBloqueado;
 
         [Display(Name = "Fecha de creación")]
         public DateTime FechaCreacion { get; set; } = DateTime.Now;

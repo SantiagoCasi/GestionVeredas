@@ -83,9 +83,15 @@ else
                             <dt>Relevo</dt><dd>@(v.FechaRelevo?.ToString("dd/MM/yyyy") ?? "—")</dd>
                             <dt>Superficie</dt>
                             <dd>
-                                @if (v.Mediciones.Any())
+                                @if (v.EstaMedida)
                                 {
-                                    @($"{v.SuperficieTotal:N2} m²") <span class="text-muted">(@v.Mediciones.Count @(v.Mediciones.Count == 1 ? "medición" : "mediciones"))</span>
+                                    var superficie = string.Join(" · ", new[] { MedicionService.FormatearM2(v.TotalM2), MedicionService.FormatearM3(v.TotalCordonM3) }
+                                        .Where(x => x != null));
+                                    @superficie
+                                    if (v.Roturas.Count > 0)
+                                    {
+                                        <span class="text-muted">(@v.Roturas.Count @(v.Roturas.Count == 1 ? "pozo" : "pozos"))</span>
+                                    }
                                 }
                                 else
                                 {
@@ -94,10 +100,10 @@ else
                             </dd>
                         </dl>
 
-                        @if (v.Mediciones.Any())
+                        @if (v.Roturas.Any())
                         {
                             <div class="mt-2 d-flex flex-wrap gap-1">
-                                @foreach (var tipo in v.Mediciones.Where(m => m.TipoSuelo != null).Select(m => m.TipoSuelo!.Tipo).Distinct())
+                                @foreach (var tipo in v.Roturas.Where(r => r.TipoSuelo != null).Select(r => r.TipoSuelo!.Tipo).Distinct())
                                 {
                                     <span class="badge rounded-pill text-bg-light border fw-normal">@tipo</span>
                                 }

@@ -23,10 +23,11 @@ else
     <div class="row g-3">
         @foreach (var p in Model)
         {
-            var total = p.Veredas.Count;
-            var finalizadas = p.Veredas.Count(v => v.Estado == Estado.Finalizado);
-            var avance = total == 0 ? 0 : (int)Math.Round(finalizadas * 100.0 / total);
-            var superficie = p.Veredas.Sum(v => v.SuperficieTotal);
+            var totales = PaqueteService.CalcularTotales(p.Veredas.Select(v => new VeredaTotales(v.Estado, v.TotalM2, v.TotalCordonM3)));
+            var total = totales.Cantidad;
+            var finalizadas = totales.Finalizadas;
+            var avance = totales.PorcentajeAvance;
+            var superficie = totales.TotalM2;
 
             <div class="col-12 col-lg-6">
                 <div class="card data-card h-100">
@@ -45,7 +46,7 @@ else
                         <div class="row text-center my-3 g-2">
                             <div class="col-4"><div class="mini-stat"><strong>@total</strong><span>Veredas</span></div></div>
                             <div class="col-4"><div class="mini-stat"><strong>@finalizadas</strong><span>Finalizadas</span></div></div>
-                            <div class="col-4"><div class="mini-stat"><strong>@superficie.ToString("N2")</strong><span>m²</span></div></div>
+                            <div class="col-4"><div class="mini-stat"><strong>@MedicionService.FormatearNumero(superficie, 2)</strong><span>m²</span></div></div>
                         </div>
 
                         <div class="d-flex justify-content-between small text-muted mb-1">

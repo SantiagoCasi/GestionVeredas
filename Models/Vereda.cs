@@ -94,10 +94,6 @@ namespace SistemaVeredas.Models
         [Display(Name = "Dirección")]
         public string Direccion => string.IsNullOrWhiteSpace(Altura) ? Calle : $"{Calle} {Altura}";
 
-        [NotMapped]
-        [Display(Name = "Superficie total (m²)")]
-        public decimal SuperficieTotal => Mediciones.Sum(m => m.Superficie ?? 0);
-
         public Prioridad? Prioridad { get; set; }
 
         public Estado Estado { get; set; } = Estado.SinDefinir;
@@ -115,6 +111,32 @@ namespace SistemaVeredas.Models
         public int? PaqueteId { get; set; }
         public Paquete? Paquete { get; set; }
 
-        public ICollection<Medicion> Mediciones { get; set; } = new List<Medicion>();
+        // Medición (SPEC-001). Los totales los calcula el servidor con MedicionService: nunca se bindean.
+        // Fórmula de los pozos: "(2*3)+(5*9)". Null = sin medir.
+        [StringLength(500, ErrorMessage = "La medición puede tener hasta 500 caracteres.")]
+        [Display(Name = "Medición")]
+        public string? Medicion { get; set; }
+
+        // Suma de los subtotales de sus roturas.
+        [Column(TypeName = "decimal(10,2)")]
+        [Display(Name = "Total (m²)")]
+        public decimal? TotalM2 { get; set; }
+
+        [Display(Name = "Cordón")]
+        public bool TieneCordon { get; set; }
+
+        [StringLength(500, ErrorMessage = "La medición puede tener hasta 500 caracteres.")]
+        [Display(Name = "Medición cordón")]
+        public string? MedicionCordon { get; set; }
+
+        [Column(TypeName = "decimal(10,3)")]
+        [Display(Name = "Total cordón (m³)")]
+        public decimal? TotalCordonM3 { get; set; }
+
+        public ICollection<Rotura> Roturas { get; set; } = new List<Rotura>();
+
+        // No se traduce a SQL: en las consultas usar "v.TotalM2 != null || v.TotalCordonM3 != null".
+        [NotMapped]
+        public bool EstaMedida => TotalM2 != null || TotalCordonM3 != null;
     }
 }

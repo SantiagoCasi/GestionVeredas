@@ -9,7 +9,8 @@ using SistemaVeredas.Models; // Importa los modelos que representan las tablas y
 using SistemaVeredas.Models.ViewModels; // Importa modelos especializados para las vistas, ayudando a estructurar la información mostrada. 
 using SistemaVeredas.Services; // Importa servicios auxiliares, como el servicio de hashing de contraseñas. 
 using System;
-using System.Net.Mail; // Importa clases para enviar correos electrónicos.
+using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 
 // Define el namespace o espacio de nombres de los controladores de la aplicación 
 namespace SistemaVeredas.Controllers
@@ -21,11 +22,33 @@ namespace SistemaVeredas.Controllers
         // Instancia privada que guarda el contexto de la base de datos, para acceder y modificar datos
         private readonly AppDbContext _context;
 
+        // Envío del mail de recuperación (la configuración SMTP está fuera del código).
+        private readonly IEmailService _email;
+
         // Constructor del controlador donde se inyecta el contexto de la base de datos
-        public AccessController(AppDbContext context)
+        public AccessController(AppDbContext context, IEmailService email)
         {
             _context = context; // Asigna el contexto recibido a la variable privada para usarla en métodos
+            _email = email;
         }
+
+        // Mensajes de la recuperación por mail (SPEC-003, sección 4).
+        public const string MensajeSmtpNoDisponible =
+            "La recuperación por mail no está disponible en este momento. Pedile a otro usuario que te asigne una contraseña nueva desde Usuarios.";
+        public const string MensajeSmtpFallo =
+            "No pudimos enviar el mail. Probá de nuevo más tarde o pedile a otro usuario que te asigne una contraseña nueva desde Usuarios.";
+        public const string MensajeMailEnviado =
+            "Te enviamos un mail con el enlace para elegir una contraseña nueva.";
+        public const string MensajeContrasenaCambiada =
+            "Listo, cambiaste la contraseña. Ya podés iniciar sesión.";
+        public const string MensajeTokenInvalido =
+            "El enlace no es válido. Pedí uno nuevo.";
+
+        // StartRecovery genera Guid.NewGuid().ToString("N"): 32 caracteres hexadecimales en minúscula.
+        // Cualquier otro valor (incluido "tokenbloqueado" en cualquier variante) se rechaza ANTES de consultar la base.
+        private static readonly Regex FormatoToken = new("^[0-9a-f]{32}$", RegexOptions.Compiled);
+
+        public static bool TokenValido([NotNullWhen(true)] string? token) => token != null && FormatoToken.IsMatch(token);
 
         // /Access redirige al login
         public IActionResult Index()
@@ -109,6 +132,7 @@ namespace SistemaVeredas.Controllers
         }
 
         [HttpPost] // Método que recibe datos del formulario (POST) para iniciar recuperación
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> StartRecovery(RecoveryViewModel model)
         {
             if (!ModelState.IsValid) // Valida la información recibida del formulario
@@ -126,28 +150,35 @@ namespace SistemaVeredas.Controllers
                 return View(model); // Retorna la vista para que el usuario intente otra vez
             }
 
-            // Genera un token único para la recuperación de contraseña 
+            // Genera un token único para la recuperación de contraseña y lo guarda
             var token = Guid.NewGuid().ToString("N");
-
-            // Asigna el token de recuperación al usuario 
             usuario.token_recovery = token;
-            _context.Entry(usuario).State = EntityState.Modified; // Marca la entidad como modificada
-            await _context.SaveChangesAsync(); // Guarda los cambios en la base de datos
+            await _context.SaveChangesAsync();
 
-            // Envía el correo con el token para recuperación 
-            Sendemail(usuario.UsEmail, token);
+            // El enlace toma el dominio de la solicitud: sirve igual en localhost y en el hosting.
+            var enlace = Url.Action("Recovery", "Access", new { token }, Request.Scheme) ?? string.Empty;
 
-            // Mensaje temporal para informar éxito 
-            TempData["MensajeExito"] = "El enlace de recuperación se ha enviado a su correo registrado correctamente.";
-            return RedirectToAction("Login", "Access"); // Redirige a la vista de login
+            var resultado = await _email.EnviarRecuperacionAsync(usuario.UsEmail, enlace);
+            if (resultado == ResultadoEnvio.Enviado)
+            {
+                TempData["MensajeExito"] = MensajeMailEnviado;
+                return RedirectToAction("Login", "Access"); // Redirige a la vista de login
+            }
+
+            // No se pudo mandar: el token vuelve a quedar bloqueado para que el enlace no sirva.
+            usuario.token_recovery = Usuario.TokenBloqueado;
+            await _context.SaveChangesAsync();
+
+            ViewBag.Error = resultado == ResultadoEnvio.NoConfigurado ? MensajeSmtpNoDisponible : MensajeSmtpFallo;
+            return View(model);
         }
 
         [HttpGet] // Solicitud GET para acceder a la vista de recuperación con un token
         public async Task<IActionResult> Recovery(string token)
         {
-            if (string.IsNullOrEmpty(token)) // Verifica que el token esté presente
+            if (!TokenValido(token)) // El token tiene que tener el formato que genera StartRecovery
             {
-                TempData["Error"] = "Token no válido."; // Mensaje de error
+                TempData["Error"] = MensajeTokenInvalido; // Mensaje de error
                 return RedirectToAction("StartRecovery", "Access"); // Redirige a inicio de recuperación
             }
 
@@ -172,14 +203,16 @@ namespace SistemaVeredas.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Recovery(RecoveryPasswordViewModel model)
         {
-            if (!ModelState.IsValid)
+            // Primero el formato del token, antes de validar el modelo y de consultar la base (SEG-01).
+            if (!TokenValido(model.token))
             {
-                return View(model);
+                TempData["Error"] = MensajeTokenInvalido;
+                return RedirectToAction("StartRecovery", "Access");
             }
 
-            if (model.UsContrasena != model.UsContrasena2)
+            // El largo (8 a 50) y que coincidan las dos contraseñas lo validan los atributos del modelo.
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError(string.Empty, "Las contraseñas no coinciden.");
                 return View(model);
             }
 
@@ -187,73 +220,22 @@ namespace SistemaVeredas.Controllers
             var usuario = await _context.Usuarios
                 .FirstOrDefaultAsync(u => u.token_recovery == model.token);
 
-            if (usuario == null) // Si no existe el token o el usuario 
+            if (usuario == null || string.IsNullOrEmpty(model.token)) // Si no existe el token o el usuario 
             {
-                TempData["Error"] = "Token inválido. Solicite un nuevo enlace de recuperación.";
+                TempData["Error"] = MensajeTokenInvalido;
                 return RedirectToAction("StartRecovery", "Access");
             }
 
             // Actualiza la contraseña del usuario con la nueva contraseña hasheada
             usuario.UsContrasena = PasswordService.HashPassword(model.UsContrasena!);
-            usuario.token_recovery = "tokenbloqueado"; // Marca el token como usado para que no se reutilice
+            usuario.token_recovery = Usuario.TokenBloqueado; // Marca el token como usado para que no se reutilice
 
 
             _context.Entry(usuario).State = EntityState.Modified; // Marca entidad modificada
             await _context.SaveChangesAsync(); // Guarda cambios en la DB
 
-            TempData["MensajeExito"] = "Contraseña modificada con éxito. Ya puede iniciar sesión.";
+            TempData["MensajeExito"] = MensajeContrasenaCambiada;
             return RedirectToAction("Login", "Access"); // Redirige a login
-        }
-
-        // Método privado para enviar un correo de restablecimiento de contraseña
-        private void Sendemail(string EmailDestino, string token)
-        {
-            // Dirección base del sitio para construir el link de recuperación
-            string urlDomain = "https://localhost:7054/";
-            var url = Url.Action("Recovery", "Access", new { token = token }, Request.Scheme);
-            // Opcional: encodear para HTML
-            var urlEscaped = System.Text.Encodings.Web.HtmlEncoder.Default.Encode(url);
-
-            // Construcción del mensaje con cuerpo HTML 
-            var oMailMessage = new MailMessage(
-                            "casisantiagopablo@gmail.com",
-                            EmailDestino,
-                            "Restablecimiento de contraseña – WebTech",
-                            $@" 
-                                <div style='font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 650px; margin: 0 auto; padding: 20px;'> 
-                                    <h2 style='color: #004d80;'>Solicitud de restablecimiento de contraseña</h2> 
-                                    <p>Estimado/a usuario/a:</p> 
-                                    <p>Recibimos una solicitud para restablecer la contraseña de su cuenta en el <strong>Plataforma de aprendizaje WebTech.</p> 
-                                    <p>Si usted realizó esta solicitud, haga clic en el siguiente enlace para crear una nueva contraseña:</p> 
-                                    <div style='text-align: center; margin: 25px 0;'> 
-                                        <a href='{urlEscaped}'  
-                                           style='display: inline-block; padding: 12px 24px; background-color: #004d80; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;'> 
-                                            Restablecer mi contraseña 
-                                        </a> 
-                                    </div> 
-                                    <p>Este enlace es válido por una sola vez y expirará en 30 minutos.</p> 
-                                    <p><strong>¿No solicitó este cambio?</strong> Si usted no ha solicitado restablecer su contraseña, por favor ignore este mensaje. Su cuenta permanecerá segura.</p> 
-                                    <p>Para cualquier duda o asistencia adicional, no dude en contactar al Departamento de Desarrollo de Software del instituto.</p> 
-                                    <hr style='border: 0; border-top: 1px solid #eee; margin: 30px 0;' /> 
-                                    <p style='font-size: 0.9em; color: #666;'> 
-                                        Escuela Online gratuita por y para la comunidad de informática<br> 
-                                        <em>Formando profesionales desde siempre</em> 
-                                    </p> 
-                                </div>"
-                            );
-
-            oMailMessage.IsBodyHtml = true; // Especifica que el cuerpo es HTML
-
-            // Configuración del cliente SMTP para enviar el correo vía Gmail(puerto 587, SSL)
-            using var oSmtpClient = new SmtpClient("smtp.gmail.com")
-            {
-                EnableSsl = true,
-                UseDefaultCredentials = false,
-                Port = 587,
-                Credentials = new System.Net.NetworkCredential("casisantiagopablo@gmail.com", "lzohvefhtehybtbb")
-            };
-
-            oSmtpClient.Send(oMailMessage); // Enviar el correo 
         }
 
         // No hay registro público: los usuarios se crean desde UsuariosController,
