@@ -46,7 +46,7 @@ namespace SistemaVeredas.Services
                 .OrderBy(v => v.Calle).ThenBy(v => v.Altura)
                 .Select(v => new
                 {
-                    v.Id, v.Calle, v.Altura, v.EntreCalle1, v.EntreCalle2,
+                    v.Id, v.Codigo, v.Calle, v.Altura, v.EntreCalle1, v.EntreCalle2,
                     v.Estado, v.Prioridad, v.TotalM2, v.TotalCordonM3, v.Fotos
                 })
                 .ToListAsync();
@@ -54,6 +54,7 @@ namespace SistemaVeredas.Services
             var veredas = filas.Select(v => new VeredaEnPaqueteViewModel
             {
                 Id = v.Id,
+                Codigo = v.Codigo,
                 Direccion = Direccion(v.Calle, v.Altura),
                 EntreCalles = EntreCalles(v.EntreCalle1, v.EntreCalle2),
                 Estado = v.Estado,
@@ -101,7 +102,7 @@ namespace SistemaVeredas.Services
                 .OrderBy(v => v.Calle).ThenBy(v => v.Altura)
                 .Select(v => new
                 {
-                    v.Id, v.Calle, v.Altura, v.EntreCalle1, v.EntreCalle2,
+                    v.Id, v.Codigo, v.Calle, v.Altura, v.EntreCalle1, v.EntreCalle2,
                     v.Estado, v.Prioridad, v.TotalM2, v.TotalCordonM3, v.FechaReclamo
                 })
                 .ToListAsync();
@@ -113,6 +114,7 @@ namespace SistemaVeredas.Services
                 return new VeredaSeleccionViewModel
                 {
                     Id = v.Id,
+                    Codigo = v.Codigo,
                     Direccion = direccion,
                     EntreCalles = entre,
                     Estado = v.Estado,
@@ -121,7 +123,7 @@ namespace SistemaVeredas.Services
                     TotalM2 = v.TotalM2,
                     TotalCordonM3 = v.TotalCordonM3,
                     FechaReclamo = v.FechaReclamo,
-                    TextoBusqueda = $"{direccion} {entre}".Trim().ToLowerInvariant()
+                    TextoBusqueda = $"{v.Codigo} {direccion} {entre}".Trim().ToLowerInvariant()
                 };
             }).ToList();
         }

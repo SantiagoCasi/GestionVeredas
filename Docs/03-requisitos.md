@@ -40,6 +40,7 @@
 | RF-VER-15 | Elegir el estado y la prioridad de listas fijas. | Debe | Confirmado | 1.4.4.1 |
 | RF-VER-16 | Al escribir los términos, mostrar un renglón por pozo con sus medidas, su subtotal y un desplegable de tipo de suelo. | Debe | Confirmado | 1.4.4.2 |
 | RF-VER-17 | Ver en el detalle cada pozo con su tipo de suelo, el total en m² y el total en m³ del cordón. | Debe | A confirmar | 1.4.4.6 |
+| RF-VER-18 | Cada vereda tiene un código numérico (1, 2, 3…) que ve el usuario final, distinto del Id interno. Es lo primero que se define; no se puede repetir; el usuario puede escribirlo o asignarlo automáticamente (el siguiente libre) y editarlo mientras no lo use otra vereda. | Debe | Confirmado | 1.4.4.1 |
 
 ### 1.3 Tipos de suelo (TSU)
 

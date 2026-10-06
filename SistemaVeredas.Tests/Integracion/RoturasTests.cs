@@ -32,7 +32,8 @@ namespace SistemaVeredas.Tests.Integracion
             var campos = new List<KeyValuePair<string, string>>
             {
                 new("Calle", calle),
-                new("Estado", "SinDefinir")
+                new("Estado", "SinDefinir"),
+                new("codigoAutomatico", "true")   // Crear: el código se asigna solo (RF-VER-18); en Editar se ignora
             };
             if (medicion != null) campos.Add(new("Medicion", medicion));
             for (var i = 0; i < tipos.Length; i++)
@@ -165,6 +166,7 @@ namespace SistemaVeredas.Tests.Integracion
 
             var campos = Campos(calle, string.Join("+", Enumerable.Repeat("1*1", 84)), Enumerable.Repeat<int?>(tipo, 84).ToArray());
             campos.Add(new("Id", id.ToString()));
+            campos.Add(new("Codigo", (await BuscarAsync(calle))!.Codigo.ToString()));
             campos.Add(new("fotosAEliminar", foto));
             var r = await c.PostFormAsync($"/Veredas/Edit/{id}", $"/Veredas/Edit/{id}", campos);
 
@@ -187,6 +189,7 @@ namespace SistemaVeredas.Tests.Integracion
 
             var campos = Campos(calle, "(4*5)", tipo);
             campos.Add(new("Id", id.ToString()));
+            campos.Add(new("Codigo", (await BuscarAsync(calle))!.Codigo.ToString()));
             var r = await c.PostFormAsync($"/Veredas/Edit/{id}", $"/Veredas/Edit/{id}", campos);
 
             Assert.Equal(HttpStatusCode.Redirect, r.StatusCode);

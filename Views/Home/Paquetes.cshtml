@@ -53,7 +53,7 @@ else
                             <span>Avance</span><span>@avance%</span>
                         </div>
                         <div class="progress mb-3" role="progressbar" aria-valuenow="@avance" aria-valuemin="0" aria-valuemax="100" style="height:8px">
-                            <div class="progress-bar bg-success" style="width:@avance%"></div>
+                            <div class="progress-bar bg-primary" style="width:@avance%"></div>
                         </div>
 
                         @if (!string.IsNullOrWhiteSpace(p.Observacion))
@@ -67,7 +67,7 @@ else
                                 @foreach (var v in p.Veredas.OrderBy(v => v.Calle).ThenBy(v => v.Altura))
                                 {
                                     <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                        <a asp-controller="Veredas" asp-action="Details" asp-route-id="@v.Id" class="text-decoration-none">@v.Direccion</a>
+                                        <a asp-controller="Veredas" asp-action="Details" asp-route-id="@v.Id" class="text-decoration-none"><span class="text-muted">#@v.Codigo</span> @v.Direccion</a>
                                         <span class="badge @v.Estado.BadgeClass()">@v.Estado.GetDisplayName()</span>
                                     </li>
                                 }

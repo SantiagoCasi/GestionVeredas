@@ -25,7 +25,7 @@ else
 {
     <div class="row g-2 mb-3">
         <div class="col-12 col-md-6">
-            <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por dirección o entre calles…" aria-label="Buscar" />
+            <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por código, dirección o entre calles…" aria-label="Buscar" />
         </div>
         <div class="col-12 col-md-3">
             <select id="filtroEstado" class="form-select" aria-label="Filtrar por estado">
@@ -53,6 +53,7 @@ else
                         <th style="width:2.5rem">
                             <input type="checkbox" id="seleccionarTodas" class="form-check-input" aria-label="Seleccionar todas" />
                         </th>
+                        <th>Código</th>
                         <th>Dirección</th>
                         <th>Estado</th>
                         <th>Prioridad</th>
@@ -70,6 +71,7 @@ else
                                 <input type="checkbox" class="form-check-input sel-vereda" name="veredaIds" value="@v.Id"
                                        id="@($"vereda_{v.Id}")" aria-label="@($"Elegir {v.Direccion}")" />
                             </td>
+                            <td class="fw-bold text-nowrap">@v.Codigo</td>
                             <td>
                                 <label for="@($"vereda_{v.Id}")" class="fw-semibold mb-0" style="cursor:pointer">@v.Direccion</label>
                                 @if (v.EntreCalles != null)
@@ -91,7 +93,7 @@ else
                             <td class="text-nowrap">
                                 @if (v.EstaMedida)
                                 {
-                                    <span class="badge text-bg-success">Medida</span>
+                                    <span class="badge text-bg-primary">Medida</span>
                                     <div class="small text-muted mt-1">@totalesMedicion</div>
                                 }
                                 else

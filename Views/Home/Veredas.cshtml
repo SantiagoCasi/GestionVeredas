@@ -22,7 +22,7 @@ else
 {
     <div class="row g-2 mb-3">
         <div class="col-12 col-md-8">
-            <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por calle, vecino, proveedor o paquete…" />
+            <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por código, calle, vecino, proveedor o paquete…" />
         </div>
         <div class="col-12 col-md-4">
             <select id="filtroEstado" class="form-select">
@@ -42,7 +42,7 @@ else
                 ? "A cargo del frentista"
                 : v.Proveedor == null ? "Sin proveedor" : $"{v.Proveedor.Nombre} {v.Proveedor.Apellido}".Trim();
             var vecino = $"{v.Nombre} {v.Apellido}".Trim();
-            var textoBusqueda = $"{v.Direccion} {v.EntreCalle1} {v.EntreCalle2} {vecino} {proveedor} {v.Paquete?.Nombre} {v.Observacion}".ToLower();
+            var textoBusqueda = $"{v.Codigo} {v.Direccion} {v.EntreCalle1} {v.EntreCalle2} {vecino} {proveedor} {v.Paquete?.Nombre} {v.Observacion}".ToLower();
 
             <div class="col-12 col-sm-6 col-lg-4 vereda-item" data-estado="@v.Estado" data-texto="@textoBusqueda">
                 <div class="card data-card h-100">
@@ -66,6 +66,7 @@ else
                                 <span class="badge text-bg-light border">@v.ListaFotos.Count fotos</span>
                             }
                         </div>
+                        <div class="small fw-bold text-primary">Código @v.Codigo</div>
                         <h2 class="h5 card-title mb-0">@v.Direccion</h2>
                         @if (!string.IsNullOrWhiteSpace(v.EntreCalle1) || !string.IsNullOrWhiteSpace(v.EntreCalle2))
                         {
@@ -120,8 +121,8 @@ else
                         <a asp-controller="Veredas" asp-action="Edit" asp-route-id="@v.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
                         @if (v.LinkGoogleMaps != null)
                         {
-                            <a href="@v.LinkGoogleMaps" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success ms-auto">Mapa</a>
-                            <a href="@v.LinkStreetView" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success">360°</a>
+                            <a href="@v.LinkGoogleMaps" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary ms-auto">Mapa</a>
+                            <a href="@v.LinkStreetView" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary">360°</a>
                         }
                     </div>
                 </div>

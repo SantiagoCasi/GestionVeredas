@@ -19,7 +19,7 @@
 }
 <div class="row g-2 mb-3">
     <div class="col-12 col-md-6">
-        <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por calle, vecino, proveedor o paquete…" />
+        <input id="filtroTexto" type="search" class="form-control" placeholder="Buscar por código, calle, vecino, proveedor o paquete…" />
     </div>
     <div class="col-12 col-md-3">
         <select id="filtroMedicion" class="form-select" aria-label="Filtrar por medición">
@@ -69,6 +69,7 @@
                 <th style="width:2.5rem">
                     <input type="checkbox" id="seleccionarTodas" class="form-check-input" aria-label="Seleccionar todas" />
                 </th>
+                <th>Código</th>
                 <th>Foto</th>
                 <th>Dirección</th>
                 <th>Vecino</th>
@@ -88,7 +89,7 @@
             var reparacion = item.ACargoFrentista
                 ? "Frentista"
                 : item.Proveedor == null ? "—" : $"{item.Proveedor.Nombre} {item.Proveedor.Apellido}".Trim();
-            var texto = $"{item.Direccion} {item.EntreCalle1} {item.EntreCalle2} {vecino} {reparacion} {item.Paquete?.Nombre}".ToLower();
+            var texto = $"{item.Codigo} {item.Direccion} {item.EntreCalle1} {item.EntreCalle2} {vecino} {reparacion} {item.Paquete?.Nombre}".ToLower();
 
             var medida = item.EstaMedida;
             var totalesMedicion = string.Join(" · ", new[] { MedicionService.FormatearM2(item.TotalM2), MedicionService.FormatearM3(item.TotalCordonM3) }
@@ -108,6 +109,7 @@
                                aria-label="@($"{item.Direccion} ya está en un paquete")" />
                     }
                 </td>
+                <td class="fw-bold text-nowrap">@item.Codigo</td>
                 <td>
                     @if (item.ListaFotos.Any())
                     {
@@ -142,7 +144,7 @@
                 <td class="text-nowrap">
                     @if (medida)
                     {
-                        <span class="badge text-bg-success">Medida</span>
+                        <span class="badge text-bg-primary">Medida</span>
                         <div class="small text-muted mt-1">@totalesMedicion</div>
                     }
                     else

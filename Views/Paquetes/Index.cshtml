@@ -1,4 +1,4 @@
-﻿@model IEnumerable<SistemaVeredas.Models.Paquete>
+@model IEnumerable<SistemaVeredas.Models.Paquete>
 
 @{
     ViewData["Title"] = "Paquetes";
@@ -7,53 +7,42 @@
 
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
     <h1 class="h3 mb-0">Paquetes</h1>
-    <a asp-action="Create" class="btn btn-primary btn-sm">+ Nuevo paquete</a>
+    <a asp-action="Create" class="btn btn-guardar btn-sm">+ Nuevo paquete</a>
 </div>
 
-<table class="table align-middle">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Fecha)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Proveedor)
-            </th>
-            <th>Veredas</th>
-            <th>
-                @Html.DisplayNameFor(model => model.Observacion)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id" class="fw-semibold text-decoration-none">@item.Nombre</a>
-            </td>
-            <td>
-                @item.Fecha.ToString("dd/MM/yyyy")
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Proveedor!.Nombre)
-            </td>
-            <td>
-                @(cantidades.TryGetValue(item.Id, out var cantidad) ? cantidad : 0)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Observacion)
-            </td>
-            <td class="text-nowrap">
-                <a asp-action="AgregarVeredas" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Agregar veredas</a>
-                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Ver</a>
-                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
-                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Eliminar</a>
-            </td>
-        </tr>
+<div class="table-responsive bg-white rounded-3 shadow-sm">
+    <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+            <tr>
+                <th>@Html.DisplayNameFor(model => model.Nombre)</th>
+                <th>@Html.DisplayNameFor(model => model.Fecha)</th>
+                <th>@Html.DisplayNameFor(model => model.Proveedor)</th>
+                <th>Veredas</th>
+                <th>@Html.DisplayNameFor(model => model.Observacion)</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+@foreach (var item in Model)
+{
+            <tr>
+                <td><a asp-action="Details" asp-route-id="@item.Id" class="fw-semibold text-decoration-none">@item.Nombre</a></td>
+                <td>@item.Fecha.ToString("dd/MM/yyyy")</td>
+                <td>@Html.DisplayFor(modelItem => item.Proveedor!.Nombre)</td>
+                <td>@(cantidades.TryGetValue(item.Id, out var cantidad) ? cantidad : 0)</td>
+                <td>@Html.DisplayFor(modelItem => item.Observacion)</td>
+                <td class="text-nowrap text-end">
+                    <a asp-action="AgregarVeredas" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Agregar veredas</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">Ver</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Eliminar</a>
+                </td>
+            </tr>
 }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
+@if (!Model.Any())
+{
+    <div class="empty-state mt-3">Todavía no hay paquetes cargados.</div>
+}

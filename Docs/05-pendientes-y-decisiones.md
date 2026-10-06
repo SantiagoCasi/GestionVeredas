@@ -83,6 +83,7 @@ Cada pregunta trae una **propuesta**. Si la propuesta sirve, alcanza con aprobar
 | D-27 | Los datos de la tabla Mediciones son de prueba: la migración los borra. | 30/09/2026 |
 | D-28 | Base de desarrollo: `Server=DESKTOP-DTLN15N;Database=GestionVeredas;Trusted_Connection=True;Encrypt=False;`. Base de pruebas: la misma instancia con `Database=GestionVeredas_Pruebas`. | 30/09/2026 |
 | D-29 | Se agrega la tabla `Roturas` (una vereda tiene varias): orden, medidas, tipo de suelo obligatorio y subtotal. `Veredas` guarda la fórmula completa, el total en m² y el cordón. | 30/09/2026 |
+| D-30 | La vereda tiene `Codigo` (entero, único, índice `IX_Veredas_Codigo`), separado del `Id`. Se valida en pantalla, en el servidor y en la base. Las veredas existentes reciben 1..N por orden de Id en la migración `CodigoDeVereda`. El usuario lo puede editar si no está repetido. | 06/10/2026 |
 
 ## 3. Riesgos
 

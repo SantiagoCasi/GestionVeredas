@@ -1,4 +1,4 @@
-﻿@model SistemaVeredas.Models.Paquete
+@model SistemaVeredas.Models.Paquete
 
 @{
     ViewData["Title"] = "Eliminar paquete";
@@ -13,42 +13,24 @@
     };
 }
 
-<h1>Eliminar paquete</h1>
+<div class="mx-auto" style="max-width: 640px;">
+    <a asp-action="Index" class="small text-decoration-none">&larr; Volver a la lista</a>
+    <h1 class="h3 mb-1">Eliminar paquete</h1>
+    <p class="text-muted mb-3">¿Seguro que querés eliminar el paquete «@Model.Nombre»?</p>
+    <div class="alert alert-warning">@avisoVeredas</div>
 
-<h3>¿Seguro que querés eliminar el paquete «@Model.Nombre»?</h3>
-<div class="alert alert-warning">@avisoVeredas</div>
-<div>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Fecha)
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.Fecha.ToString("dd/MM/yyyy")
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Proveedor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Proveedor!.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Observacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Observacion)
-        </dd>
-    </dl>
+    <section class="form-seccion">
+        <div class="form-seccion-body py-2">
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Nombre)</span><span class="v">@Html.DisplayFor(model => model.Nombre)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Fecha)</span><span class="v">@Model.Fecha.ToString("dd/MM/yyyy")</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Proveedor)</span><span class="v">@(Model.Proveedor?.Nombre ?? "—")</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Observacion)</span><span class="v">@Html.DisplayFor(model => model.Observacion)</span></div>
+        </div>
+    </section>
 
-    <form asp-action="Delete">
+    <form asp-action="Delete" class="d-flex justify-content-end gap-2 mb-4">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
-        <a asp-action="Index">Volver a la lista</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
     </form>
 </div>

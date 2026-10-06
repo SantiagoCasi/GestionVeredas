@@ -1,36 +1,23 @@
-﻿@model SistemaVeredas.Models.Proveedor
+@model SistemaVeredas.Models.Proveedor
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Proveedor";
 }
 
-<h1>Details</h1>
+<div class="mx-auto" style="max-width: 640px;">
+    <a asp-action="Index" class="small text-decoration-none">&larr; Volver a la lista</a>
+    <h1 class="h3 mb-3">Proveedor</h1>
 
-<div>
-    <h4>Proveedor</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Apellido)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Apellido)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Telefono)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Telefono)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <section class="form-seccion">
+        <div class="form-seccion-body py-2">
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Nombre)</span><span class="v">@Html.DisplayFor(model => model.Nombre)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Apellido)</span><span class="v">@Html.DisplayFor(model => model.Apellido)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Telefono)</span><span class="v">@Html.DisplayFor(model => model.Telefono)</span></div>
+        </div>
+    </section>
+
+    <div class="d-flex justify-content-end gap-2 mb-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">Volver a la lista</a>
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-guardar">Editar</a>
+    </div>
 </div>

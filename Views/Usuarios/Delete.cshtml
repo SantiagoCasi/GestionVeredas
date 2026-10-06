@@ -1,33 +1,28 @@
-﻿@model SistemaVeredas.Models.ViewModels.UsuarioViewModel
+@model SistemaVeredas.Models.ViewModels.UsuarioViewModel
 
 @{
-    ViewData["Title"] = "Eliminar";
+    ViewData["Title"] = "Eliminar usuario";
 }
 
-<h1>Eliminar</h1>
+<div class="mx-auto" style="max-width: 640px;">
+    <a asp-action="Index" class="small text-decoration-none">&larr; Volver a la lista</a>
+    <h1 class="h3 mb-1">Eliminar usuario</h1>
+    <p class="text-muted mb-3">¿Seguro que querés eliminar este usuario?</p>
 
-<h3>¿Seguro que querés eliminar este usuario?</h3>
-<div>
-    <h4>Usuario</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsNombre)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.UsNombre)</dd>
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsApellido)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.UsApellido)</dd>
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsEmail)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.UsEmail)</dd>
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UsActivo)</dt>
-        <dd class="col-sm-9">@(Model.UsActivo ? "Sí" : "No")</dd>
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FechaCreacion)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.FechaCreacion)</dd>
-        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.UltimoAcceso)</dt>
-        <dd class="col-sm-9">@Html.DisplayFor(model => model.UltimoAcceso)</dd>
-    </dl>
+    <section class="form-seccion">
+        <div class="form-seccion-body py-2">
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.UsNombre)</span><span class="v">@Html.DisplayFor(model => model.UsNombre)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.UsApellido)</span><span class="v">@Html.DisplayFor(model => model.UsApellido)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.UsEmail)</span><span class="v">@Html.DisplayFor(model => model.UsEmail)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.UsActivo)</span><span class="v">@(Model.UsActivo ? "Sí" : "No")</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.FechaCreacion)</span><span class="v">@Html.DisplayFor(model => model.FechaCreacion)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.UltimoAcceso)</span><span class="v">@Html.DisplayFor(model => model.UltimoAcceso)</span></div>
+        </div>
+    </section>
 
-    <form asp-action="Delete">
+    <form asp-action="Delete" class="d-flex justify-content-end gap-2 mb-4">
         <input type="hidden" asp-for="UsId" />
-        <input type="submit" value="Eliminar" class="btn btn-danger" /> |
-        <a asp-action="Index">Volver a la lista</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
     </form>
 </div>

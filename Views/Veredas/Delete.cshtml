@@ -1,117 +1,34 @@
-﻿@model SistemaVeredas.Models.Vereda
+@model SistemaVeredas.Models.Vereda
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar vereda";
 }
 
-<h1>Delete</h1>
+<div class="mx-auto" style="max-width: 640px;">
+    <a asp-action="Index" class="small text-decoration-none">&larr; Volver a la lista</a>
+    <h1 class="h3 mb-1">Eliminar vereda</h1>
+    <p class="text-muted mb-3">¿Seguro que querés eliminar esta vereda? Se borran también sus fotos y mediciones.</p>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>Vereda</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Nombre)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Apellido)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Apellido)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Calle)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Calle)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EntreCalle1)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EntreCalle1)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.EntreCalle2)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.EntreCalle2)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Altura)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Altura)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Ubicacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Ubicacion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Observacion)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Observacion)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaReclamo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaReclamo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.FechaRelevo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.FechaRelevo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Fotos)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Fotos)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Prioridad)
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.Prioridad.GetDisplayName()
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Estado)
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.Estado.GetDisplayName()
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ACargoFrentista)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ACargoFrentista)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Proveedor)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Proveedor.Nombre)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Paquete)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Paquete.Nombre)
-        </dd>
-    </dl>
-    
-    <form asp-action="Delete">
+    <section class="form-seccion">
+        <div class="form-seccion-body py-2">
+            <div class="dato-fila"><span class="k">Código</span><span class="v">@Model.Codigo</span></div>
+            <div class="dato-fila"><span class="k">Dirección</span><span class="v">@Model.Direccion</span></div>
+            <div class="dato-fila"><span class="k">Entre calles</span><span class="v">@(string.IsNullOrWhiteSpace(Model.EntreCalle1) && string.IsNullOrWhiteSpace(Model.EntreCalle2) ? "—" : $"{Model.EntreCalle1} y {Model.EntreCalle2}")</span></div>
+            <div class="dato-fila"><span class="k">Vecino</span><span class="v">@(string.IsNullOrWhiteSpace($"{Model.Nombre} {Model.Apellido}".Trim()) ? "—" : $"{Model.Nombre} {Model.Apellido}".Trim())</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Estado)</span><span class="v">@Model.Estado.GetDisplayName()</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Prioridad)</span><span class="v">@(Model.Prioridad == null ? "—" : Model.Prioridad.GetDisplayName())</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.FechaReclamo)</span><span class="v">@(Model.FechaReclamo?.ToString("dd/MM/yyyy") ?? "—")</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.FechaRelevo)</span><span class="v">@(Model.FechaRelevo?.ToString("dd/MM/yyyy") ?? "—")</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.ACargoFrentista)</span><span class="v">@(Model.ACargoFrentista ? "Sí" : "No")</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Proveedor)</span><span class="v">@(Model.Proveedor?.Nombre ?? "—")</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Paquete)</span><span class="v">@(Model.Paquete?.Nombre ?? "—")</span></div>
+            <div class="dato-fila"><span class="k">Fotos</span><span class="v">@(Model.ListaFotos.Count == 0 ? "—" : Model.ListaFotos.Count == 1 ? "1 foto" : $"{Model.ListaFotos.Count} fotos")</span></div>
+        </div>
+    </section>
+
+    <form asp-action="Delete" class="d-flex justify-content-end gap-2 mb-4">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+        <input type="submit" value="Eliminar" class="btn btn-danger" />
     </form>
 </div>

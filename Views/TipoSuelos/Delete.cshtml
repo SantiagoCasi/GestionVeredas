@@ -1,46 +1,18 @@
-﻿@model SistemaVeredas.Models.TipoSuelo
+@model SistemaVeredas.Models.TipoSuelo
 
 @{
-    ViewData["Title"] = "Delete";
+    ViewData["Title"] = "Eliminar tipo de suelo";
 
     // RN-13: si alguna vereda lo usa, no se elimina: se marca como no disponible.
     var enUso = ViewData["VeredasQueLoUsan"] as int? ?? 0;
     var textoVeredas = enUso == 1 ? "1 vereda" : $"{enUso} veredas";
 }
 
-<h1>Delete</h1>
+<div class="mx-auto" style="max-width: 640px;">
+    <a asp-action="Index" class="small text-decoration-none">&larr; Volver a la lista</a>
+    <h1 class="h3 mb-1">Eliminar tipo de suelo</h1>
+    <p class="text-muted mb-3">¿Seguro que querés eliminar este tipo de suelo?</p>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-    <h4>TipoSuelo</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Tipo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Tipo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Medida)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Medida)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Color)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Color)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Disponible)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Disponible)
-        </dd>
-    </dl>
-    
     @if (enUso > 0)
     {
         <div class="alert alert-warning">
@@ -48,9 +20,18 @@
         </div>
     }
 
-    <form asp-action="Delete">
+    <section class="form-seccion">
+        <div class="form-seccion-body py-2">
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Tipo)</span><span class="v">@Html.DisplayFor(model => model.Tipo)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Medida)</span><span class="v">@Html.DisplayFor(model => model.Medida)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Color)</span><span class="v">@Html.DisplayFor(model => model.Color)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Disponible)</span><span class="v">@(Model.Disponible ? "Sí" : "No")</span></div>
+        </div>
+    </section>
+
+    <form asp-action="Delete" class="d-flex justify-content-end gap-2 mb-4">
         <input type="hidden" asp-for="Id" />
-        <input type="submit" value="@(enUso > 0 ? "Marcar como no disponible" : "Delete")" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+        <input type="submit" value="@(enUso > 0 ? "Marcar como no disponible" : "Eliminar")" class="btn btn-danger" />
     </form>
 </div>

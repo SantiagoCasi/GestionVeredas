@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using SistemaVeredas.Data;
 using SistemaVeredas.Models;
@@ -31,7 +33,8 @@ namespace SistemaVeredas.Controllers
         {
             var veredas = _context.Veredas
                 .Include(v => v.Paquete)
-                .Include(v => v.Proveedor);
+                .Include(v => v.Proveedor)
+                .OrderBy(v => v.Codigo);
 
             // Paquetes para "Agregar al paquete…" (RF-PAQ-08), los más nuevos primero.
             ViewData["Paquetes"] = (await _context.Paquetes.AsNoTracking()
@@ -121,8 +124,10 @@ namespace SistemaVeredas.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [RequestSizeLimit(100 * 1024 * 1024)]
+        // "Codigo" tampoco se bindea: ValidarCodigoAsync lo lee del formulario, lo valida y lo asigna.
+        // "codigoAutomatico" = el usuario pidió que el sistema asigne el siguiente número libre.
         public async Task<IActionResult> Create([Bind("Id,Nombre,Apellido,Calle,EntreCalle1,EntreCalle2,Altura,Ubicacion,Observacion,FechaReclamo,FechaRelevo,Prioridad,Estado,ACargoFrentista,ProveedorId,PaqueteId,Medicion,TieneCordon,MedicionCordon")] Vereda vereda,
-            List<IFormFile>? archivos, List<int?>? tiposRotura)
+            List<IFormFile>? archivos, List<int?>? tiposRotura, bool codigoAutomatico = false)
         {
             var errorFotos = FotoService.Validar(archivos);
             if (errorFotos != null) ModelState.AddModelError("Fotos", errorFotos);
@@ -131,11 +136,36 @@ namespace SistemaVeredas.Controllers
             foreach (var e in MedicionService.AplicarAVereda(vereda, tipos))
                 ModelState.AddModelError(e.Campo, e.Mensaje);
             await ValidarTiposSueloAsync(vereda);
+            await ValidarCodigoAsync(vereda, codigoAutomatico, 0);
 
             if (ModelState.IsValid)
             {
                 _context.Add(vereda); // también guarda las roturas nuevas
-                await _context.SaveChangesAsync(); // primero se guarda para tener el Id
+
+                // Primero se guarda para tener el Id. Si otra persona tomó el mismo código justo antes
+                // (el índice único lo rechaza), con código automático se prueba con el siguiente.
+                var guardada = false;
+                for (var intento = 0; intento < 3 && !guardada; intento++)
+                {
+                    try
+                    {
+                        await _context.SaveChangesAsync();
+                        guardada = true;
+                    }
+                    catch (DbUpdateException ex) when (EsCodigoDuplicado(ex))
+                    {
+                        if (!codigoAutomatico) break;
+                        vereda.Codigo = await SiguienteCodigoAsync();
+                    }
+                }
+
+                if (!guardada)
+                {
+                    _context.Entry(vereda).State = EntityState.Detached;
+                    ModelState.AddModelError("Codigo", $"Ya existe una vereda con el código {vereda.Codigo}. Probá con otro número.");
+                    CargarListas(vereda, FilasDesdeFormulario(vereda, tipos));
+                    return View(vereda);
+                }
 
                 var rutas = await _fotos.GuardarAsync(vereda.Id, archivos);
                 if (rutas.Count > 0)
@@ -203,6 +233,7 @@ namespace SistemaVeredas.Controllers
             foreach (var e in MedicionService.AplicarAVereda(vereda, tipos))
                 ModelState.AddModelError(e.Campo, e.Mensaje);
             await ValidarTiposSueloAsync(vereda);
+            await ValidarCodigoAsync(vereda, false, vereda.Id);
 
             if (ModelState.IsValid)
             {
@@ -235,6 +266,15 @@ namespace SistemaVeredas.Controllers
                     {
                         throw;
                     }
+                }
+                catch (DbUpdateException ex) when (EsCodigoDuplicado(ex))
+                {
+                    // Otra persona tomó ese código entre la validación y el guardado.
+                    foreach (var ruta in nuevas) _fotos.Eliminar(ruta);
+                    vereda.Fotos = fotosActuales;
+                    ModelState.AddModelError("Codigo", $"Ya existe una vereda con el código {vereda.Codigo}.");
+                    CargarListas(vereda, FilasDesdeFormulario(vereda, tipos));
+                    return View(vereda);
                 }
                 catch
                 {
@@ -291,6 +331,76 @@ namespace SistemaVeredas.Controllers
         {
             return _context.Veredas.Any(e => e.Id == id);
         }
+
+        // GET: Veredas/CodigoDisponible?codigo=12&id=0
+        // Lo usa el formulario para avisar al escribir si el código ya existe. "id" = la vereda que se edita (0 si es nueva).
+        [HttpGet]
+        public async Task<IActionResult> CodigoDisponible(string? codigo, int id = 0)
+        {
+            var siguiente = await SiguienteCodigoAsync();
+            var texto = (codigo ?? string.Empty).Trim();
+            if (texto.Length == 0)
+                return Json(new { valido = false, disponible = false, mensaje = string.Empty, siguiente });
+
+            if (!int.TryParse(texto, NumberStyles.None, CultureInfo.InvariantCulture, out var numero) || numero < 1)
+                return Json(new { valido = false, disponible = false, mensaje = "Tiene que ser un número entero mayor a 0.", siguiente });
+
+            var otra = await _context.Veredas.AsNoTracking()
+                .Where(v => v.Codigo == numero && v.Id != id)
+                .Select(v => new { v.Calle, v.Altura })
+                .FirstOrDefaultAsync();
+            if (otra != null)
+            {
+                var donde = PaqueteService.Direccion(otra.Calle, otra.Altura);
+                return Json(new { valido = true, disponible = false, mensaje = $"Ya lo usa la vereda de {donde}.", siguiente });
+            }
+
+            return Json(new { valido = true, disponible = true, mensaje = "Código disponible.", siguiente });
+        }
+
+        // Siguiente número libre: el mayor que existe + 1 (empieza en 1).
+        private async Task<int> SiguienteCodigoAsync()
+        {
+            var mayor = await _context.Veredas.MaxAsync(v => (int?)v.Codigo);
+            return (mayor ?? 0) + 1;
+        }
+
+        // Código de la vereda (RF-VER-18): entero mayor a 0 y único. Con "automatico" se asigna el siguiente libre.
+        // "idActual" es la vereda que se edita (0 si es nueva) para no compararla consigo misma.
+        private async Task ValidarCodigoAsync(Vereda vereda, bool automatico, int idActual)
+        {
+            // El binder ya intentó leer "Codigo" y se queja en inglés si está vacío: se valida a mano.
+            ModelState.Remove(nameof(Vereda.Codigo));
+
+            if (automatico)
+            {
+                vereda.Codigo = await SiguienteCodigoAsync();
+                return;
+            }
+
+            var texto = Request.Form["Codigo"].ToString().Trim();
+            if (texto.Length == 0)
+            {
+                ModelState.AddModelError(nameof(Vereda.Codigo), "Ingresá el código de la vereda o elegí asignarlo automáticamente.");
+                return;
+            }
+
+            if (!int.TryParse(texto, NumberStyles.None, CultureInfo.InvariantCulture, out var numero) || numero < 1)
+            {
+                ModelState.AddModelError(nameof(Vereda.Codigo), "El código tiene que ser un número entero mayor a 0.");
+                return;
+            }
+
+            vereda.Codigo = numero;
+            if (await _context.Veredas.AnyAsync(v => v.Codigo == numero && v.Id != idActual))
+                ModelState.AddModelError(nameof(Vereda.Codigo), $"Ya existe una vereda con el código {numero}.");
+        }
+
+        // El índice único de Codigo rechazó el guardado (otra persona tomó el número en el mismo momento).
+        private static bool EsCodigoDuplicado(DbUpdateException ex) =>
+            ex.InnerException is SqlException s
+            && (s.Number == 2601 || s.Number == 2627)
+            && s.Message.Contains("IX_Veredas_Codigo", StringComparison.OrdinalIgnoreCase);
 
         // Desplegables del formulario y renglones de pozos a mostrar.
         private void CargarListas(Vereda? vereda, List<RoturaFilaViewModel> filas)

@@ -1,58 +1,62 @@
-﻿@model SistemaVeredas.Models.ViewModels.UsuarioEditViewModel
+@model SistemaVeredas.Models.ViewModels.UsuarioEditViewModel
 
 @{
     ViewData["Title"] = "Editar usuario";
 }
 
-<h1>Editar usuario</h1>
+<div class="mx-auto" style="max-width: 640px;">
+    <a asp-action="Index" class="small text-decoration-none">&larr; Volver a la lista</a>
+    <h1 class="h3 mb-1">Editar usuario</h1>
+    <div class="mb-3"></div>
 
-<h4>Usuario</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="UsId" />
-            <div class="form-group mb-2">
-                <label asp-for="UsNombre" class="control-label"></label>
-                <input asp-for="UsNombre" class="form-control" />
-                <span asp-validation-for="UsNombre" class="text-danger"></span>
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="UsId" />
+        <section class="form-seccion">
+            <div class="form-seccion-head">Datos del usuario</div>
+            <div class="form-seccion-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="UsNombre" class="form-label"></label>
+                        <input asp-for="UsNombre" class="form-control" />
+                        <span asp-validation-for="UsNombre" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="UsApellido" class="form-label"></label>
+                        <input asp-for="UsApellido" class="form-control" />
+                        <span asp-validation-for="UsApellido" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-12">
+                        <label asp-for="UsEmail" class="form-label"></label>
+                        <input asp-for="UsEmail" type="email" class="form-control" />
+                        <span asp-validation-for="UsEmail" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="NuevaContrasena" class="form-label"></label>
+                        <input asp-for="NuevaContrasena" class="form-control" />
+                        <div class="form-text">Dejala vacía para no cambiarla. Entre 8 y 50 caracteres.</div>
+                        <span asp-validation-for="NuevaContrasena" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="ConfirmarContrasena" class="form-label"></label>
+                        <input asp-for="ConfirmarContrasena" class="form-control" />
+                        <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input class="form-check-input" asp-for="UsActivo" />
+                            <label class="form-check-label" asp-for="UsActivo"></label>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group mb-2">
-                <label asp-for="UsApellido" class="control-label"></label>
-                <input asp-for="UsApellido" class="form-control" />
-                <span asp-validation-for="UsApellido" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-2">
-                <label asp-for="UsEmail" class="control-label"></label>
-                <input asp-for="UsEmail" type="email" class="form-control" />
-                <span asp-validation-for="UsEmail" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-2">
-                <label asp-for="NuevaContrasena" class="control-label"></label>
-                <input asp-for="NuevaContrasena" class="form-control" />
-                <div class="form-text">Dejala vacía para no cambiarla. Entre 8 y 50 caracteres.</div>
-                <span asp-validation-for="NuevaContrasena" class="text-danger"></span>
-            </div>
-            <div class="form-group mb-2">
-                <label asp-for="ConfirmarContrasena" class="control-label"></label>
-                <input asp-for="ConfirmarContrasena" class="form-control" />
-                <span asp-validation-for="ConfirmarContrasena" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check mb-2">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="UsActivo" /> @Html.DisplayNameFor(model => model.UsActivo)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Guardar" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+        </section>
 
-<div>
-    <a asp-action="Index">Volver a la lista</a>
+        <div class="d-flex justify-content-end gap-2 mb-4">
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            <input type="submit" value="Guardar cambios" class="btn btn-guardar" />
+        </div>
+    </form>
 </div>
 
 @section Scripts {

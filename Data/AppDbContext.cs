@@ -34,6 +34,11 @@ namespace SistemaVeredas.Data
                 .HasIndex(u => u.UsEmail)
                 .IsUnique();
 
+            // El código de la vereda es el número que ve el usuario: no puede repetirse (RF-VER-18).
+            modelBuilder.Entity<Vereda>()
+                .HasIndex(v => v.Codigo)
+                .IsUnique();
+
             // Proveedor 1—N Paquete: no se puede borrar un proveedor que tiene paquetes.
             modelBuilder.Entity<Paquete>()
                 .HasOne(p => p.Proveedor)

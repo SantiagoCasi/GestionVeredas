@@ -1,45 +1,48 @@
-﻿@model SistemaVeredas.Models.Paquete
+@model SistemaVeredas.Models.Paquete
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Nuevo paquete";
 }
 
-<h1>Create</h1>
+<div class="mx-auto" style="max-width: 640px;">
+    <a asp-action="Index" class="small text-decoration-none">&larr; Volver a la lista</a>
+    <h1 class="h3 mb-1">Nuevo paquete</h1>
+    <p class="text-muted mb-4">Después de guardarlo podés agregarle veredas.</p>
 
-<h4>Paquete</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <section class="form-seccion">
+            <div class="form-seccion-head">Datos del paquete</div>
+            <div class="form-seccion-body">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Fecha" class="form-label"></label>
+                        <input asp-for="Fecha" class="form-control" />
+                        <span asp-validation-for="Fecha" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-12">
+                        <label asp-for="ProveedorId" class="form-label"></label>
+                        <select asp-for="ProveedorId" class="form-select" asp-items="ViewBag.ProveedorId"></select>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Observacion" class="form-label"></label>
+                        <input asp-for="Observacion" class="form-control" />
+                        <span asp-validation-for="Observacion" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Fecha" class="control-label"></label>
-                <input asp-for="Fecha" class="form-control" />
-                <span asp-validation-for="Fecha" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProveedorId" class="control-label"></label>
-                <select asp-for="ProveedorId" class ="form-control" asp-items="ViewBag.ProveedorId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="Observacion" class="control-label"></label>
-                <input asp-for="Observacion" class="form-control" />
-                <span asp-validation-for="Observacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+        </section>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+        <div class="d-flex justify-content-end gap-2 mb-4">
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            <input type="submit" value="Guardar paquete" class="btn btn-guardar" />
+        </div>
+    </form>
 </div>
 
 @section Scripts {

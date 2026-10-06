@@ -30,7 +30,9 @@ namespace SistemaVeredas.Tests.Integracion
         private async Task<int> CrearVeredaAsync(int? paqueteId = null, Estado estado = Estado.SinDefinir)
         {
             await using var db = _f.CrearDbContextDirecto();
-            var v = new Vereda { Calle = $"Prueba {Guid.NewGuid():N}", Altura = "100", Estado = estado, PaqueteId = paqueteId };
+            // El código de la vereda es único (RF-VER-18): se toma el siguiente libre.
+            var codigo = (await db.Veredas.MaxAsync(x => (int?)x.Codigo) ?? 0) + 1;
+            var v = new Vereda { Codigo = codigo, Calle = $"Prueba {Guid.NewGuid():N}", Altura = "100", Estado = estado, PaqueteId = paqueteId };
             db.Veredas.Add(v);
             await db.SaveChangesAsync();
             return v.Id;

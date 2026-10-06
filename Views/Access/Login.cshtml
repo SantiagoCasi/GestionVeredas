@@ -1,4 +1,4 @@
-﻿@model SistemaVeredas.Models.ViewModels.LoginViewModel
+@model SistemaVeredas.Models.ViewModels.LoginViewModel
 @{
     ViewBag.Title = "Iniciar sesión";
     Layout = null;
@@ -7,239 +7,154 @@
 <html lang="es">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,
-initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewBag.Title - SistemaVeredas</title>
-    <link rel="stylesheet"
-          href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all
- .min.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <style>
         :root {
-            --primary-color: darksalmon;
-            --secondary-color: #f8f9fa;
-            --error-color: #dc3545;
-            --success-color: #28a745;
-            --light-bg: #f8f9fa;
+            --primario: #1e4d8c;
+            --primario-claro: #2f6fba;
+            --oscuro: #12294d;
+            --fondo: #f5f6f8;
         }
 
         body {
-            background: linear-gradient(135deg, #e6f0fa 0%, white 100%);
+            margin: 0;
             min-height: 100vh;
+            display: flex;
+            background: var(--fondo);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primario), var(--oscuro));
+        }
+
+        .login-marca {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .login-marca i {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .25);
+            display: inline-block;
+        }
+
+        .login-hero h1 { font-size: 2.2rem; margin: 30px 0 12px; }
+        .login-hero p { opacity: .85; font-size: 1.1rem; max-width: 420px; }
+
+        .login-panel {
+            flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .container {
-            max-width: 500px;
-            animation: fadeIn 0.6s ease-out;
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 14px rgba(0, 0, 0, .08);
+            padding: 34px;
+            animation: fadeIn .6s ease-out;
         }
 
         @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            overflow: hidden;
-            border: none;
+        .login-card h2 { font-size: 1.5rem; margin: 0 0 4px; }
+        .login-card .form-label { font-size: .85rem; font-weight: 600; color: #495057; }
+        .login-card .form-control { padding: 10px 12px; border-radius: 8px; }
+
+        .login-card .form-control:focus {
+            border-color: var(--primario-claro);
+            box-shadow: 0 0 0 .2rem rgba(47, 111, 186, .2);
         }
 
-        .card-header {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 25px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 1.8rem;
-            border: none;
-        }
-
-        .card-body {
-            padding: 35px;
-            background-color: white;
-        }
-
-        .logo-container {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .institute-logo {
-            max-width: 300px;
-            height: auto;
-            margin-bottom: 10px;
-            border: 1px solid black;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-            .logo-container img {
-                max-width: 360px;
-                height: auto;
-            }
-
-        .message-container {
-            margin-bottom: 20px;
-            border-radius: 8px;
-            padding: 15px;
-            text-align: center;
-            font-weight: 500;
-        }
-
-        .success-message {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 4px solid var(--success-color);
-        }
-
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid var(--error-color);
-        }
-
-        .form-group {
-            margin-bottom: 25px;
-        }
-
-            .form-group label {
-                font-weight: 600;
-                color: #2c3e50;
-                display: block;
-                margin-bottom: 10px;
-                font-size: 1.05rem;
-                text-align: center;
-            }
-
-        .form-control {
-            border-radius: 10px;
-            padding: 14px 15px;
-            border: 2px solid #e1e5ee;
-            transition: all 0.3s;
+        .btn-ingresar {
             width: 100%;
-            font-size: 1.05rem;
-        }
-
-            .form-control:focus {
-                border-color: var(--primary-color);
-                box-shadow: 0 0 0 0.25rem rgba(0, 77, 128, 0.25);
-            }
-
-        .btn-container {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 25px;
-            gap: 15px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border: none;
-            padding: 14px 20px;
-            border-radius: 10px;
+            padding: 11px;
+            border: 0;
+            border-radius: 8px;
+            color: #fff;
             font-weight: 600;
-            transition: all 0.3s;
-            flex: 1;
-            font-size: 1.1rem;
+            background: linear-gradient(135deg, var(--primario), var(--primario-claro));
         }
 
-            .btn-primary:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 7px 20px rgba(0, 77, 128, 0.3);
-            }
+        .btn-ingresar:hover { color: #fff; filter: brightness(1.08); }
+        .btn-volver { width: 100%; padding: 11px; border-radius: 8px; font-weight: 600; }
+        .login-link { color: var(--primario); font-weight: 600; font-size: .85rem; text-decoration: none; }
+        .login-link:hover { text-decoration: underline; }
 
-        .btn-secondary {
-            background: linear-gradient(90deg, #6c757d, #495057);
-            border: none;
-            padding: 14px 20px;
-            border-radius: 10px;
-            font-weight: 600;
-            transition: all 0.3s;
-            flex: 1;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .aviso { border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: .9rem; }
+        .aviso-error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        .aviso-ok { background: #e8f0fa; color: #163a6b; border-left: 4px solid var(--primario); }
 
-            .btn-secondary:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 7px 15px rgba(108, 117, 125, 0.3);
-            }
+        .campo-clave { position: relative; }
+        .campo-clave .form-control { padding-right: 44px; }
+        .btn-ojo { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: transparent; border: 0; color: #6c757d; padding: 4px 8px; }
 
-        .icon-left {
-            margin-right: 8px;
-            transition: transform 0.3s;
-        }
+        .reglas { background: #f5f6f8; border-left: 4px solid var(--primario); border-radius: 8px; padding: 12px 14px; font-size: .9rem; }
 
-        .btn-secondary:hover .icon-left {
-            transform: translateX(-3px);
-        }
-
-        @@media (max-width: 576px) {
-            .btn-container {
-                flex-direction: column;
-            }
-
-            .card-body {
-                padding: 25px;
-            }
+        @@media (max-width: 768px) {
+            .login-hero { display: none; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="card-header text-center">
-                <h3 class="m-0">Iniciar sesión</h3>
-            </div>
-            <div class="card-body">
-                <form asp-action="Login" asp-controller="Access" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
-                    <input type="hidden" asp-for="ReturnUrl" />
+    <div class="login-hero">
+        <div class="login-marca"><i></i>SistemaVeredas</div>
+        <h1>Gestión de reparaciones de veredas</h1>
+        <p>Registrá, agrupá en paquetes y seguí el estado de cada vereda de Colón.</p>
+    </div>
 
-                    <div class="form-group">
-                        <label asp-for="UsEmail"></label>
-                        <input asp-for="UsEmail" type="email" class="form-control" placeholder="ejemplo@gmail.com" autofocus />
-                        <span asp-validation-for="UsEmail" class="text-danger"></span>
-                    </div>
+    <div class="login-panel">
+        <div class="login-card">
+            <h2>Iniciar sesión</h2>
+            <p class="text-muted mb-4">Ingresá con tu cuenta</p>
 
-                    <div class="form-group">
-                        <label asp-for="UsContrasena"></label>
-                        <input asp-for="UsContrasena" type="password" class="form-control" />
-                        <span asp-validation-for="UsContrasena" class="text-danger"></span>
-                    </div>
+            <form asp-action="Login" asp-controller="Access" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+                <input type="hidden" asp-for="ReturnUrl" />
 
-                    <div class="form-check mb-3">
+                <div class="mb-3">
+                    <label asp-for="UsEmail" class="form-label"></label>
+                    <input asp-for="UsEmail" type="email" class="form-control" placeholder="ejemplo@gmail.com" autofocus />
+                    <span asp-validation-for="UsEmail" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="UsContrasena" class="form-label"></label>
+                    <input asp-for="UsContrasena" type="password" class="form-control" />
+                    <span asp-validation-for="UsContrasena" class="text-danger"></span>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
                         <input asp-for="Recordarme" class="form-check-input" />
                         <label asp-for="Recordarme" class="form-check-label"></label>
                     </div>
+                    <a asp-controller="Access" asp-action="StartRecovery" class="login-link">Olvidé mi contraseña</a>
+                </div>
 
-                    <div class="btn-container">
-                        <a asp-controller="Access" asp-action="StartRecovery" class="btn btn-secondary">
-                            <i class="fas fa-key icon-left"></i>
-                            Olvidé mi contraseña
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt me-2"></i> Ingresar
-                        </button>
-                    </div>
-                </form>
-            </div>
+                <button type="submit" class="btn btn-ingresar">Ingresar</button>
+            </form>
         </div>
     </div>
 

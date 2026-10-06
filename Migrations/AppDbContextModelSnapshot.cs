@@ -213,6 +213,9 @@ namespace SistemaVeredas.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("Codigo")
+                        .HasColumnType("int");
+
                     b.Property<string>("EntreCalle1")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -276,6 +279,9 @@ namespace SistemaVeredas.Migrations
                         .HasColumnType("nvarchar(500)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Codigo")
+                        .IsUnique();
 
                     b.HasIndex("PaqueteId");
 

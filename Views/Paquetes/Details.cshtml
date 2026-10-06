@@ -47,7 +47,7 @@
                 <span>Avance</span><strong class="d-inline fs-6">@t.PorcentajeAvance %</strong>
             </div>
             <div class="progress my-1" role="progressbar" aria-valuenow="@t.PorcentajeAvance" aria-valuemin="0" aria-valuemax="100" style="height:8px">
-                <div class="progress-bar bg-success" style="width:@(t.PorcentajeAvance)%"></div>
+                <div class="progress-bar bg-primary" style="width:@(t.PorcentajeAvance)%"></div>
             </div>
             <span>@t.Finalizadas de @t.Cantidad finalizadas</span>
         </div>
@@ -71,6 +71,7 @@ else
         <table class="table table-hover align-middle mb-0">
             <thead class="table-light">
                 <tr>
+                    <th>Código</th>
                     <th>Foto</th>
                     <th>Dirección</th>
                     <th>Estado</th>
@@ -85,6 +86,7 @@ else
                     var totalesMedicion = string.Join(" · ", new[] { MedicionService.FormatearM2(v.TotalM2), MedicionService.FormatearM3(v.TotalCordonM3) }
                         .Where(x => x != null));
                     <tr>
+                        <td class="fw-bold text-nowrap">@v.Codigo</td>
                         <td>
                             @if (v.FotoMiniatura != null)
                             {
@@ -116,7 +118,7 @@ else
                         <td class="text-nowrap">
                             @if (v.EstaMedida)
                             {
-                                <span class="badge text-bg-success">Medida</span>
+                                <span class="badge text-bg-primary">Medida</span>
                                 <div class="small text-muted mt-1">@totalesMedicion</div>
                             }
                             else

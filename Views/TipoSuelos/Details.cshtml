@@ -1,42 +1,24 @@
-﻿@model SistemaVeredas.Models.TipoSuelo
+@model SistemaVeredas.Models.TipoSuelo
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Tipo de suelo";
 }
 
-<h1>Details</h1>
+<div class="mx-auto" style="max-width: 640px;">
+    <a asp-action="Index" class="small text-decoration-none">&larr; Volver a la lista</a>
+    <h1 class="h3 mb-3">Tipo de suelo</h1>
 
-<div>
-    <h4>TipoSuelo</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Tipo)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Tipo)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Medida)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Medida)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Color)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Color)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Disponible)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Disponible)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <section class="form-seccion">
+        <div class="form-seccion-body py-2">
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Tipo)</span><span class="v">@Html.DisplayFor(model => model.Tipo)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Medida)</span><span class="v">@Html.DisplayFor(model => model.Medida)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Color)</span><span class="v">@Html.DisplayFor(model => model.Color)</span></div>
+            <div class="dato-fila"><span class="k">@Html.DisplayNameFor(model => model.Disponible)</span><span class="v">@(Model.Disponible ? "Sí" : "No")</span></div>
+        </div>
+    </section>
+
+    <div class="d-flex justify-content-end gap-2 mb-4">
+        <a asp-action="Index" class="btn btn-outline-secondary">Volver a la lista</a>
+        <a asp-action="Edit" asp-route-id="@Model?.Id" class="btn btn-guardar">Editar</a>
+    </div>
 </div>

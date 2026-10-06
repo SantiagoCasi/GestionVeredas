@@ -1,0 +1,43 @@
+@* Tarjeta "Identificación" del formulario de vereda: el código numérico que ve el usuario final (RF-VER-18).
+   ViewData["EsNuevo"] = true en Crear: ofrece "Asignar automáticamente". Lo maneja wwwroot/js/codigo-vereda.js.
+   El campo no usa asp-for a propósito: la validación la hace el servidor (con mensajes en español). *@
+@model SistemaVeredas.Models.Vereda
+@{
+    var esNuevo = ViewData["EsNuevo"] as bool? ?? false;
+    var enviado = Context.Request.HasFormContentType ? Context.Request.Form["Codigo"].ToString() : string.Empty;
+    var codigoActual = Model?.Codigo ?? 0;   // en Crear el modelo es null
+    var valor = codigoActual > 0 ? codigoActual.ToString() : enviado;
+    var autoMarcada = esNuevo && Context.Request.HasFormContentType && Context.Request.Form["codigoAutomatico"].ToString().Contains("true");
+}
+
+<section class="form-seccion">
+    <div class="form-seccion-head"><span class="form-seccion-num">1</span>Identificación<small>Número que ve el usuario</small></div>
+    <div class="form-seccion-body">
+        <div class="row g-3 align-items-start">
+            <div class="col-md-4">
+                <label asp-for="Codigo" class="form-label"></label>
+                <input type="text" id="Codigo" name="Codigo" value="@valor" class="form-control"
+                       inputmode="numeric" maxlength="9" autocomplete="off"
+                       data-id="@(Model?.Id ?? 0)" data-url="@Url.Action("CodigoDisponible", "Veredas")" />
+                <span asp-validation-for="Codigo" class="text-danger d-block"></span>
+                <div id="codigoEstado" class="form-text" aria-live="polite"></div>
+            </div>
+            @if (esNuevo)
+            {
+                <div class="col-md-8 pt-md-4">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="codigoAutomatico" name="codigoAutomatico" value="true" @(autoMarcada ? "checked" : null) />
+                        <label class="form-check-label" for="codigoAutomatico">Asignar automáticamente</label>
+                    </div>
+                    <div class="form-text">El próximo número libre es el <strong id="codigoSiguiente">…</strong>.</div>
+                </div>
+            }
+            else
+            {
+                <div class="col-md-8 pt-md-4">
+                    <div class="form-text">Podés cambiarlo mientras no lo use otra vereda.</div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

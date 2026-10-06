@@ -1,5 +1,9 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+@{
+    var ctrl = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string Act(params string[] nombres) => nombres.Contains(ctrl, StringComparer.OrdinalIgnoreCase) ? " active" : "";
+}
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,9 +15,9 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3 nav-principal">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SistemaVeredas</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><span class="brand-logo"></span>SistemaVeredas</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -21,22 +25,21 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link@(Act("Home"))" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Veredas" asp-action="Index">Veredas</a>
+                            <a class="nav-link@(Act("Veredas"))" asp-area="" asp-controller="Veredas" asp-action="Index">Veredas</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Proveedores" asp-action="Index">Proveedores</a>
+                            <a class="nav-link@(Act("Paquetes"))" asp-area="" asp-controller="Paquetes" asp-action="Index">Paquetes</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Paquetes" asp-action="Index">Paquetes</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="TipoSuelos" asp-action="Index">Tipos de suelo</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Usuarios" asp-action="Index">Usuarios</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle@(Act("Proveedores", "TipoSuelos", "Usuarios"))" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Más</a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Proveedores" asp-action="Index">Proveedores</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="TipoSuelos" asp-action="Index">Tipos de suelo</a></li>
+                                <li><a class="dropdown-item" asp-area="" asp-controller="Usuarios" asp-action="Index">Usuarios</a></li>
+                            </ul>
                         </li>
                     </ul>
                     @if (User.Identity?.IsAuthenticated == true)

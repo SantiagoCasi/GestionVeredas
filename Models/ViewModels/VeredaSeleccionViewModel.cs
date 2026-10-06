@@ -6,6 +6,7 @@ namespace SistemaVeredas.Models.ViewModels
     public class VeredaSeleccionViewModel
     {
         public int Id { get; set; }
+        public int Codigo { get; set; }
         public string Direccion { get; set; } = string.Empty;
         public string? EntreCalles { get; set; }
         public Estado Estado { get; set; }

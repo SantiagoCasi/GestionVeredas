@@ -8,6 +8,11 @@ namespace SistemaVeredas.Models
     {
         public int Id { get; set; }
 
+        // Número de la vereda para el usuario final (1, 2, 3…). No es el Id interno y no puede repetirse.
+        // El controlador lo valida a mano (único, entero mayor a 0) o lo asigna solo con "codigoAutomatico".
+        [Display(Name = "Código")]
+        public int Codigo { get; set; }
+
         [StringLength(100)]
         public string? Nombre { get; set; }
 

@@ -1,108 +1,151 @@
-﻿@model SistemaVeredas.Models.Vereda
+@model SistemaVeredas.Models.Vereda
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Nueva vereda";
 }
 
-<h1>Create</h1>
+<div class="container-form mx-auto" style="max-width: 1000px;">
+    <h1 class="h3 mb-1">Nueva vereda</h1>
+    <p class="text-muted mb-4">Completá los datos en orden.</p>
 
-<h4>Vereda</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" enctype="multipart/form-data">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Nombre" class="control-label"></label>
-                <input asp-for="Nombre" class="form-control" />
-                <span asp-validation-for="Nombre" class="text-danger"></span>
+    <form asp-action="Create" enctype="multipart/form-data">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <partial name="_Codigo" model="Model" view-data='new ViewDataDictionary(ViewData) { ["EsNuevo"] = true }' />
+
+
+        <section class="form-seccion">
+            <div class="form-seccion-head"><span class="form-seccion-num">2</span>Datos del frentista<small>Quién reclama</small></div>
+            <div class="form-seccion-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" />
+                        <span asp-validation-for="Nombre" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="Apellido" class="form-label"></label>
+                        <input asp-for="Apellido" class="form-control" />
+                        <span asp-validation-for="Apellido" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Apellido" class="control-label"></label>
-                <input asp-for="Apellido" class="form-control" />
-                <span asp-validation-for="Apellido" class="text-danger"></span>
+        </section>
+
+        <section class="form-seccion">
+            <div class="form-seccion-head"><span class="form-seccion-num">3</span>Ubicación<small>Dirección y mapa</small></div>
+            <div class="form-seccion-body">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label asp-for="Calle" class="form-label"></label>
+                        <input asp-for="Calle" class="form-control" />
+                        <span asp-validation-for="Calle" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="Altura" class="form-label"></label>
+                        <input asp-for="Altura" class="form-control" />
+                        <span asp-validation-for="Altura" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="EntreCalle1" class="form-label"></label>
+                        <input asp-for="EntreCalle1" class="form-control" />
+                        <span asp-validation-for="EntreCalle1" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="EntreCalle2" class="form-label"></label>
+                        <input asp-for="EntreCalle2" class="form-control" />
+                        <span asp-validation-for="EntreCalle2" class="text-danger"></span>
+                    </div>
+                    <div class="col-12">
+                        <partial name="_MapaUbicacion" model="Model" />
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Calle" class="control-label"></label>
-                <input asp-for="Calle" class="form-control" />
-                <span asp-validation-for="Calle" class="text-danger"></span>
+        </section>
+
+        <section class="form-seccion">
+            <div class="form-seccion-head"><span class="form-seccion-num">4</span>Reclamo y relevamiento</div>
+            <div class="form-seccion-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label asp-for="FechaReclamo" class="form-label"></label>
+                        <input asp-for="FechaReclamo" class="form-control" />
+                        <span asp-validation-for="FechaReclamo" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="FechaRelevo" class="form-label"></label>
+                        <input asp-for="FechaRelevo" class="form-control" />
+                        <span asp-validation-for="FechaRelevo" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Prioridad" class="form-label"></label>
+                        <select asp-for="Prioridad" class="form-select" asp-items="Html.GetEnumSelectList<Prioridad>()">
+                            <option value="">-- Sin prioridad --</option>
+                        </select>
+                        <span asp-validation-for="Prioridad" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<Estado>()"></select>
+                        <span asp-validation-for="Estado" class="text-danger"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Observacion" class="form-label"></label>
+                        <input asp-for="Observacion" class="form-control" />
+                        <span asp-validation-for="Observacion" class="text-danger"></span>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="EntreCalle1" class="control-label"></label>
-                <input asp-for="EntreCalle1" class="form-control" />
-                <span asp-validation-for="EntreCalle1" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="EntreCalle2" class="control-label"></label>
-                <input asp-for="EntreCalle2" class="form-control" />
-                <span asp-validation-for="EntreCalle2" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Altura" class="control-label"></label>
-                <input asp-for="Altura" class="form-control" />
-                <span asp-validation-for="Altura" class="text-danger"></span>
-            </div>
-            <partial name="_MapaUbicacion" model="Model" />
-            <div class="form-group">
-                <label asp-for="Observacion" class="control-label"></label>
-                <input asp-for="Observacion" class="form-control" />
-                <span asp-validation-for="Observacion" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaReclamo" class="control-label"></label>
-                <input asp-for="FechaReclamo" class="form-control" />
-                <span asp-validation-for="FechaReclamo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FechaRelevo" class="control-label"></label>
-                <input asp-for="FechaRelevo" class="form-control" />
-                <span asp-validation-for="FechaRelevo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label class="control-label" for="archivos">Fotos</label>
+        </section>
+
+        <section class="form-seccion">
+            <div class="form-seccion-head"><span class="form-seccion-num">5</span>Fotos</div>
+            <div class="form-seccion-body">
+                <label class="form-label" for="archivos">Fotos</label>
                 <input type="file" id="archivos" name="archivos" class="form-control" accept="image/*" multiple />
                 <div class="form-text">Podés elegir varias fotos a la vez (jpg, png o webp, hasta 10 MB cada una). Desde el celular se abre la cámara o la galería.</div>
                 <span asp-validation-for="Fotos" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Prioridad" class="control-label"></label>
-                <select asp-for="Prioridad" class="form-control" asp-items="Html.GetEnumSelectList<Prioridad>()">
-                    <option value="">-- Sin prioridad --</option>
-                </select>
-                <span asp-validation-for="Prioridad" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Estado" class="control-label"></label>
-                <select asp-for="Estado" class="form-control" asp-items="Html.GetEnumSelectList<Estado>()"></select>
-                <span asp-validation-for="Estado" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="ACargoFrentista" /> @Html.DisplayNameFor(model => model.ACargoFrentista)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="ProveedorId" class="control-label"></label>
-                <select asp-for="ProveedorId" class="form-control" asp-items="ViewBag.ProveedorId">
-                    <option value="">-- Sin proveedor --</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label asp-for="PaqueteId" class="control-label"></label>
-                <select asp-for="PaqueteId" class="form-control" asp-items="ViewBag.PaqueteId">
-                    <option value="">-- Sin paquete --</option>
-                </select>
-            </div>
-            <partial name="_Medicion" model="Model" />
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+        </section>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+        <section class="form-seccion">
+            <div class="form-seccion-head"><span class="form-seccion-num">6</span>Gestión</div>
+            <div class="form-seccion-body">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="ProveedorId" class="form-label"></label>
+                        <select asp-for="ProveedorId" class="form-select" asp-items="ViewBag.ProveedorId">
+                            <option value="">-- Sin proveedor --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="PaqueteId" class="form-label"></label>
+                        <select asp-for="PaqueteId" class="form-select" asp-items="ViewBag.PaqueteId">
+                            <option value="">-- Sin paquete --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" asp-for="ACargoFrentista" />
+                            <label class="form-check-label" asp-for="ACargoFrentista"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-seccion">
+            <div class="form-seccion-head"><span class="form-seccion-num">7</span>Medición de la rotura<small>m² vereda · m³ cordón</small></div>
+            <div class="form-seccion-body">
+                <partial name="_Medicion" model="Model" />
+            </div>
+        </section>
+
+        <div class="d-flex justify-content-end gap-2 mb-4">
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            <input type="submit" value="Guardar vereda" class="btn btn-guardar" />
+        </div>
+    </form>
 </div>
 
 <partial name="_TipoSueloRapido" />
@@ -110,4 +153,5 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="~/js/medicion-vereda.js" asp-append-version="true"></script>
+    <script src="~/js/codigo-vereda.js" asp-append-version="true"></script>
 }
